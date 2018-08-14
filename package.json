@@ -1,0 +1,16 @@
+{
+  "name": "dpanc",
+  "version": "1.0.0",
+  "description": "Self Health Management dApp for Diabetes",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blockternship/dPanc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Blockternship/dPanc/issues"
+  },
+  "homepage": "https://github.com/Blockternship/dPanc#readme"
+}
