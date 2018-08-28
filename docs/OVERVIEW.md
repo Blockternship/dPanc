@@ -11,7 +11,7 @@ The standard checkup involves testing and recording the patient's blood glucose 
 If the patient can afford to own a blood glucose testing kit and has the ability to export/record the data from the device, then the doctor can assess the patient's situation better as there are more data points to build a better model of the patient. If not, then the doctor has to rely on the data generated every visit.
 
 A person's blood glucose level can be affected by many different factors such as diet, exercise, and sleep. There is a general "acceptable" range for blood glucose level, but adjusting the level depends on a person-to-person basis so most treatment options rely on self-care.
-Â
+
 Unfortunately, the US healthcare system is incredibly expensive for patients so many Type 1 Diabetics will sacrifice their health to save money.
 
 ## The Solution: dPanc
