@@ -4,7 +4,8 @@ Self Health Management dApp for Diabetes
 ## Local Development
 
 1. `nvm use`
-2. `npm start`
+2. `yarn`
+3. `yarn start:dev`
 
 You'll need to make sure you have `nvm` installed and the proper version of node (`9.X`)
 
