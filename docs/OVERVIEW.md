@@ -11,7 +11,7 @@ The standard checkup involves testing and recording the patient's blood glucose 
 If the patient can afford to own a blood glucose testing kit and has the ability to export/record the data from the device, then the doctor can assess the patient's situation better as there are more data points to build a better model of the patient. If not, then the doctor has to rely on the data generated every visit.
 
 A person's blood glucose level can be affected by many different factors such as diet, exercise, and sleep. There is a general "acceptable" range for blood glucose level, but adjusting the level depends on a person-to-person basis so most treatment options rely on self-care.
-
+Â
 Unfortunately, the US healthcare system is incredibly expensive for patients so many Type 1 Diabetics will sacrifice their health to save money.
 
 ## The Solution: dPanc
@@ -64,15 +64,15 @@ dPanc is a full end-to-end service and platform featuring:
 
 Users will interact with a Node.js web application integrated with web3 via Infura/MetaMask. Users will fill out a simple form and attach their measurements to generate their report.
 
-<img src="upload_view.png" width="400" height="400">
+<img src="images/upload_view.png" width="400" height="400">
 
 The user will then be redirected to the Report page where they can view their results.
 
-<img src="report_view.png" width="400" height="400">
+<img src="images/report_view.png" width="400" height="400">
 
 ### Data Flow
 
-![Data Flow](data_flow.png)
+![Data Flow](images/data_flow.png)
 
 A user's upload will go through a Solidity contract to be stored in two data stores in IPFS:
 - private personal store 
