@@ -64,15 +64,15 @@ dPanc is a full end-to-end service and platform featuring:
 
 Users will interact with a Node.js web application integrated with web3 via Infura/MetaMask. Users will fill out a simple form and attach their measurements to generate their report.
 
-<img src="upload_view.png" width="400" height="400">
+<img src="images/upload_view.png" width="400" height="400">
 
 The user will then be redirected to the Report page where they can view their results.
 
-<img src="report_view.png" width="400" height="400">
+<img src="images/report_view.png" width="400" height="400">
 
 ### Data Flow
 
-![Data Flow](data_flow.png)
+![Data Flow](images/data_flow.png)
 
 A user's upload will go through a Solidity contract to be stored in two data stores in IPFS:
 - private personal store 

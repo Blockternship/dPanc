@@ -27,7 +27,8 @@
     "eject": "react-scripts eject",
     "start:server": "nodemon backend/server.js",
     "start:client": "yarn start",
-    "start:dev": "concurrently --kill-others-on-fail \"yarn start:server\" \"yarn start:client\""
+    "start:dev": "concurrently --kill-others-on-fail \"yarn start:server\" \"yarn start:client\"",
+    "test:contracts": "cd contracts && yarn test:contracts"
   },
   "devDependencies": {
     "concurrently": "^4.0.1"
