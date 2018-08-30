@@ -54,11 +54,10 @@ contract dPanc {
 
   mapping(address => UserDataStore) public addressToUserDataStore;
 
-  /// @param _addr Address of the user
   /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
   /// @param _hash IPFS hash of data corresponding to _date
-  function saveFileHash(address _addr, string _date, string _hash) public {
-    addressToUserDataStore[_addr].saveFileHash(_date, _hash);
+  function saveFileHash(string _date, string _hash) public {
+    addressToUserDataStore[msg.sender].saveFileHash(_date, _hash);
   }
 }
 
@@ -79,6 +78,7 @@ contract UserDataStore {
     // Add date to datesByMonthList if first time seeing given date
     if (!dateToHash[_date].exists) {
       datesByMonthList.push(_date);
+      dateToHash[_date].exists = true;
     }
 
     dateToHash[_date].hash = _hash;
