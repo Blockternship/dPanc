@@ -1,0 +1,87 @@
+[
+  {
+    "publicKey": 234234,
+    "values": [
+      {
+        "timestamp": 1535597498,
+        "glucose": 100
+      },
+      {
+        "timestamp": 1535597198,
+        "glucose": 111
+      },
+      {
+        "timestamp": 1535596898,
+        "glucose": 118
+      },
+      {
+        "timestamp": 1535596598,
+        "glucose": 126
+      },
+      {
+        "timestamp": 1535596298,
+        "glucose": 139
+      },
+      {
+        "timestamp": 1535595998,
+        "glucose": 162
+      },
+      {
+        "timestamp": 1535595698,
+        "glucose": 177
+      },
+      {
+        "timestamp": 1535595398,
+        "glucose": 185
+      },
+      {
+        "timestamp": 1535595098,
+        "glucose": 192
+      },
+      {
+        "timestamp": 1535594798,
+        "glucose": 195
+      },
+      {
+        "timestamp": 1535594498,
+        "glucose": 192
+      },
+      {
+        "timestamp": 1535594198,
+        "glucose": 188
+      },
+      {
+        "timestamp": 1535593898,
+        "glucose": 190
+      },
+      {
+        "timestamp": 1535593598,
+        "glucose": 185
+      },
+      {
+        "timestamp": 1535593298,
+        "glucose": 182
+      },
+      {
+        "timestamp": 1535592998,
+        "glucose": 176
+      },
+      {
+        "timestamp": 1535592698,
+        "glucose": 179
+      },
+      {
+        "timestamp": 1535592398,
+        "glucose": 175
+      },
+      {
+        "timestamp": 1535592098,
+        "glucose": 170
+      },
+      {
+        "timestamp": 1535591798,
+        "glucose": 171
+      }
+    ]
+  },
+]
