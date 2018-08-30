@@ -14,3 +14,22 @@ We would also like to explore an abstraction of this idea. The notion of individ
 # Philosophy
 
 We believe that the burden of type one diabetes can be significantly reduced if patients were given the appropriate tools to manage their health. But the tools being prescribed by doctors are inadequate, and the centralization of these tools make changes slow and ineffective. If individual patients shared their medical data to support the creation of these decentralized tools, we can bring the ability to enact change to the people whom it will affect the most.
+=======
+## Local Development
+
+1. `nvm use`
+2. `yarn`
+3. `yarn start:dev`
+
+You'll need to make sure you have `nvm` installed and the proper version of node (`9.X`)
+
+### Installing nvm and the required version of node
+
+1. `npm install -g nvm`
+2. `nvm install 9`
+
+
+## Contracts (WIP)
+
+1. `cd contracts && yarn`
+2. `yarn test:contracts`

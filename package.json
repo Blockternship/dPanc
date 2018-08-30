@@ -1,0 +1,37 @@
+{
+  "name": "dpanc",
+  "version": "1.0.0",
+  "description": "Self Health Management dApp for Diabetes",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blockternship/dPanc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Blockternship/dPanc/issues"
+  },
+  "homepage": "https://github.com/Blockternship/dPanc#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "nodemon": "^1.18.3",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-scripts": "1.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "start:server": "nodemon backend/server.js",
+    "start:client": "yarn start",
+    "start:dev": "concurrently --kill-others-on-fail \"yarn start:server\" \"yarn start:client\"",
+    "test:contracts": "cd contracts && yarn test:contracts"
+  },
+  "devDependencies": {
+    "concurrently": "^4.0.1"
+  },
+  "proxy": "http://localhost:3001/"
+}

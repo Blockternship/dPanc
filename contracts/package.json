@@ -1,0 +1,20 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start:ganache:client": "bash scripts/start-ganache-client.sh",
+    "stop:ganache:client": "bash scripts/stop-ganache-client.sh",
+    "test:contracts": "npm run start:ganache:client & truffle migrate --reset --compile-all && truffle test --network development && npm run stop:ganache:client"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ganache-cli": "^6.1.8",
+    "truffle": "^4.1.14"
+  }
+}
