@@ -1,48 +1,65 @@
 import React from 'react';
-import { Container, Row, Col, Input, Button, Fa, Modal, ModalBody, ModalHeader, ModalFooter } from 'mdbreact';
+import { Card, Form } from 'semantic-ui-react';
+import { post } from 'axios';
 
-class FormsPage extends React.Component  {
-  constructor(props) {
-    super(props);
-    this.state = {
-      modal: false
-    }
-    this.toggle = this.toggle.bind(this);
-  }
+class FormsPage extends React.Component {
+  state = {
+    value: '',
+    file: '',
+  };
 
-  toggle() {
+  // Submit form details and file to express server to process
+  // If processing successful, then prompt user's MetaMask to send data to IPFS
+  onFormSubmit = async (event) => {
+    event.preventDefault();
+
+    const response = await this.uploadFile(this.state.file);
+
+    console.log(response);
+  };
+
+  // Function to change file when user uploads a new file
+  onChange = (event) => {
     this.setState({
-      modal: !this.state.modal
-    });
-  }
+      file: event.target.files[0],
+    })
+  };
+
+  // Make post call with FormData to express server
+  uploadFile = (file) => {
+    const url = 'http://localhost:3001/upload/';
+    const formData = new FormData();
+    formData.append('file', file);
+    const config = {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Access-Control-Allow-Origin': '*',
+        }
+    }
+    return post(url, formData, config)
+  };
 
   render() {
     return(
-      <Container>
-        <Row>
-          <Col md="6">
-            <Button color="info" onClick={this.toggle}>Launch dPanc's Smart Contract</Button>
-            <Modal isOpen={this.state.modal} toggle={this.toggle} className="cascading-modal">
-              <div className="modal-header primary-color white-text">
-                <h4 className="title">
-                  <Fa className="fa fa-pencil" /> Contact form</h4>
-                <button type="button" className="close" onClick={this.toggle}>
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <ModalBody className="grey-text">
-                <Input size="sm" label="Your Ethereum Address" icon="user" group type="text" validate error="wrong" success="right"/>
-                <Input size="sm" label="Device" icon="envelope" group type="email" validate error="wrong" success="right"/>
-                <Input size="sm" label="Upload Your CSV" icon="upload" group type="file" validate error="wrong" success="right"/>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="secondary" onClick={this.toggle}>Close</Button>{' '}
-                <Button color="primary">Save changes</Button>
-              </ModalFooter>
-            </Modal>
-          </Col>
-        </Row>
-      </Container>
+      <Card>
+        <Card.Content>
+          <Form onSubmit={this.onFormSubmit}>
+            <Form.Field required>
+              <label>ETH address</label>
+              <input value={this.props.address} disabled />
+            </Form.Field>
+            <Form.Field required>
+              <label>Device</label>
+              <input value="FreeStyle Libre" disabled />
+            </Form.Field>
+            <Form.Field required>
+              <label>Upload Data</label>
+              <input required type="file" onChange={this.onChange} />
+            </Form.Field>
+            <Form.Button primary disabled={this.props.disabled}>Submit</Form.Button>
+          </Form>
+        </Card.Content>
+      </Card>
     );
   }
 };

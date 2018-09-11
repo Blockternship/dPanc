@@ -1,36 +1,28 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import FormsPage from './Form';
-import Web3 from 'web3';
-import 'font-awesome/css/font-awesome.min.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'mdbreact/dist/css/mdb.css';
+import web3 from './ethereum/web3';
+import { Container, Message } from 'semantic-ui-react';
 
 class App extends Component {
   state = {
-    response: ''
+    response: '',
+    address: '',
+    error: '',
   };
 
   componentDidMount() {
-
-    const web3 = window.web3
-    if (typeof web3 !== 'undefined') {
-      // Use Mist/MetaMask's provider
-      const web3js = new Web3(web3.currentProvider);
-      console.log(web3js)
-    } else {
-      console.log('No web3? You should consider trying MetaMask!')
-      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-      const web3js = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-    }
-    // Now you can start your app & access web3 freely:
-    console.log('Cheers!')
+    this.setState({
+      address: '',
+      error: '',
+    });
 
     this.callApi()
       .then(res => this.setState({ response: res.express }))
       .catch(err => console.log(err));
-    }
+
+    this.getAccountAddress();
+  }
 
   callApi = async () => {
     const response = await fetch('/api/helloworld');
@@ -41,22 +33,40 @@ class App extends Component {
     return body;
   };
 
+  getAccountAddress = async () => {
+    if (!web3) {
+      console.log('Could not detect MetaMask.');
+      this.setState({
+        error: 'Could not detect MetaMask. Please make sure MetaMask is enabled!'
+      });
+    };
+
+    const address = await web3.eth.getAccounts();
+
+    if (address.length === 0) {
+      console.log('Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.');
+      this.setState({
+        error: 'Could not fetch accounts from MetaMask! Make sure you are logged into MetaMask.',
+      });
+    } else {
+      this.setState({
+        address: address[0],
+      });
+    }
+  };
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to dPanc</h1>
-          <p className="App-desc">
-          dPanc is a tool that allows individuals with Type 1 Diabetes
-          to be able to gain more insight around their own data.
-          </p>
-        </header>
-          <p className="App-intro">{this.state.response}</p>
-
-          <FormsPage />
-
-      </div>
+      <Container>
+        <Message negative visible={!!this.state.error} hidden={!this.state.error}>
+          <Message.Header>{this.state.error}</Message.Header>
+        </Message>
+        <p className="App-intro">{this.state.response}</p>
+        <FormsPage
+          address={this.state.address || ''}
+          disabled={!!this.state.error}
+        />
+      </Container>
     );
   }
 }
