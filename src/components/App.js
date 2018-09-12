@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import FormsPage from './Form';
-import web3 from './ethereum/web3';
+import web3 from './../ethereum/web3';
 import { Container, Message } from 'semantic-ui-react';
 
 class App extends Component {
