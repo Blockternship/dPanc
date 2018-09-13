@@ -1,8 +1,8 @@
-import { getMaxVelocity } from './MaxVelocityService';
+import { getMaxSpeedPerMinute } from './MaxSpeedService';
 
 const dataProvider = [
   {
-    expectedMaxVelocity: 5,
+    expectedMaxSpeedPerMinute: 5,
     glucoseEvents: [
       {
         timestamp: 0,
@@ -31,7 +31,7 @@ const dataProvider = [
     ]
   },
   {
-    expectedMaxVelocity: 5,
+    expectedMaxSpeedPerMinute: 5,
     glucoseEvents: [
       {
         timestamp: 0,
@@ -49,10 +49,10 @@ const dataProvider = [
   }
 ];
 
-it('returns the max velocity', () => {
+it('returns the max spped per minute', () => {
   dataProvider.forEach((testInstance) => {
-    const average = getMaxVelocity(testInstance.glucoseEvents);
+    const maxSpeedPerMinute = getMaxSpeedPerMinute(testInstance.glucoseEvents);
 
-    expect(average).toEqual(testInstance.expectedMaxVelocity);
+    expect(maxSpeedPerMinute).toEqual(testInstance.expectedMaxSpeedPerMinute);
   });
 });
