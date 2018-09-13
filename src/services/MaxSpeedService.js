@@ -12,7 +12,7 @@ const getStepSpeed = (firstGlucoseEvent, secondGlucoseEvent) => {
   const glucoseDifference = secondGlucoseEvent.glucose - firstGlucoseEvent.glucose;
   const timeDifference = secondGlucoseEvent.timestamp - firstGlucoseEvent.timestamp;
 
-  return SECONDS_PER_MINUTE * (glucoseDifference / timeDifference);
+  return Math.abs(SECONDS_PER_MINUTE * (glucoseDifference / timeDifference));
 };
 
 export { getMaxSpeedPerMinute }
