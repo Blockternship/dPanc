@@ -19,6 +19,7 @@
     "express": "^4.16.3",
     "multer": "^1.3.1",
     "nodemon": "^1.18.4",
+    "pre-commit": "^1.2.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-scripts": "1.1.4",
@@ -29,13 +30,18 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "CI=true react-scripts test --env=jsdom",
+    "test:watch": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "start:server": "nodemon backend/server.js",
     "start:client": "yarn start",
     "start:dev": "concurrently --kill-others-on-fail \"yarn start:server\" \"yarn start:client\"",
     "test:contracts": "cd contracts && yarn test:contracts"
   },
+  "pre-commit": [
+    "test",
+    "test:contracts"
+  ],
   "devDependencies": {
     "concurrently": "^4.0.1"
   },
