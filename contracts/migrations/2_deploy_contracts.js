@@ -1,5 +1,5 @@
-var HelloWorld = artifacts.require("./HelloWorld.sol");
+var dPanc = artifacts.require("./dPanc.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(HelloWorld);
+  deployer.deploy(dPanc);
 };

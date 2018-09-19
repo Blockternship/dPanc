@@ -49,45 +49,52 @@ The list of data points (timestamp + value) are under a `glucose` key as we may 
 **"date" for MVP refers to a month (YYYY-MM) since we require a whole month's data to be uploaded at once**
 
 ```
+pragma solidity ^0.4.24;
+pragma experimental ABIEncoderV2;
+
 contract dPanc {
-  // TODO: events
 
-  mapping(address => UserDataStore) public addressToUserDataStore;
-
-  /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
-  /// @param _hash IPFS hash of data corresponding to _date
-  function saveFileHash(string _date, string _hash) public {
-    addressToUserDataStore[msg.sender].saveFileHash(_date, _hash);
-  }
-}
-
-contract UserDataStore {
-  // TODO: events
+  event Upload (
+    address indexed _from,
+    string _date,
+    string _hash
+  );
 
   struct FileMetadata {
       string hash;
       bool exists;
   }
 
-  mapping(string => FileMetadata) dateToHash;  // maps date (YYYY-MM) to FileMetadata struct containing hash and exists bool
-  string[] public datesByMonthList;   // holds all dates that user has uploaded data to allow entire history retrieval
+  struct UserDataStore {
+    mapping(string => FileMetadata) dateToHash;
+    string[] datesByMonthList;
+  }
+
+  mapping(address => UserDataStore) addressToUserDataStore;
 
   /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
   /// @param _hash IPFS hash of data corresponding to _date
-  function saveFileHash(string _date, string _hash) public {
-    // Add date to datesByMonthList if first time seeing given date
-    if (!dateToHash[_date].exists) {
-      datesByMonthList.push(_date);
-      dateToHash[_date].exists = true;
+  function saveHash(string _date, string _hash) public {
+    UserDataStore storage userDataStore = addressToUserDataStore[msg.sender];
+    if (!userDataStore.dateToHash[_date].exists) {
+      userDataStore.datesByMonthList.push(_date);
+      userDataStore.dateToHash[_date].exists = true;
     }
 
-    dateToHash[_date].hash = _hash;
+    userDataStore.dateToHash[_date].hash = _hash;
+
+    emit Upload(msg.sender, _date, _hash);
   }
 
   /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
   /// @return hash IPFS hash of data corresponding to _date
-  function getFileHash(string _date) public view returns (string hash) {
-      return dateToHash[_date].hash;
+  function getHash(string _date) public view returns (string hash) {
+      return addressToUserDataStore[msg.sender].dateToHash[_date].hash;
+  }
+
+  /// @return list of dates that have IPFS hashes
+  function getUploadedDates() public view returns (string[] dates) {
+      return addressToUserDataStore[msg.sender].datesByMonthList;
   }
 }
 ```
