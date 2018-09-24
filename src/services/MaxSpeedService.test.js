@@ -2,6 +2,7 @@ import { getMaxSpeedPerMinute } from './MaxSpeedService';
 
 const dataProvider = [
   {
+    description: 'equally spaced and strictly increasing velocities',
     expectedMaxSpeedPerMinute: 5,
     glucoseEvents: [
       {
@@ -31,6 +32,7 @@ const dataProvider = [
     ]
   },
   {
+    description: 'un-equally spaced and strictly increasing velocities',
     expectedMaxSpeedPerMinute: 5,
     glucoseEvents: [
       {
@@ -46,11 +48,47 @@ const dataProvider = [
         glucose: 129
       }
     ]
+  },
+  {
+    description: 'equally spaced and negative velocities',
+    expectedMaxSpeedPerMinute: 6,
+    glucoseEvents: [
+      {
+        timestamp: 0,
+        glucose: 100
+      },
+      {
+        timestamp: 60,
+        glucose: 96
+      },
+      {
+        timestamp: 120,
+        glucose: 90
+      }
+    ]
+  },
+  {
+    description: 'equally spaced and positive and negative velocities',
+    expectedMaxSpeedPerMinute: 12,
+    glucoseEvents: [
+      {
+        timestamp: 0,
+        glucose: 100
+      },
+      {
+        timestamp: 60,
+        glucose: 110
+      },
+      {
+        timestamp: 120,
+        glucose: 98
+      }
+    ]
   }
 ];
 
-it('returns the max spped per minute', () => {
-  dataProvider.forEach((testInstance) => {
+dataProvider.forEach((testInstance) => {
+  it(`returns the max speed for ${testInstance.description}`, () => {
     const maxSpeedPerMinute = getMaxSpeedPerMinute(testInstance.glucoseEvents);
 
     expect(maxSpeedPerMinute).toEqual(testInstance.expectedMaxSpeedPerMinute);
