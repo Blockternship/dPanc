@@ -1,26 +1,25 @@
-export const getTimeWeightedMean = (arrayOfGlucoseEvents) => {
-  const arrayOfRectangleSums = [];
+import { getStepWiseArray } from './StepWiseArrayService';
 
-  arrayOfGlucoseEvents.forEach((val, i) => {
-    if (i !== arrayOfGlucoseEvents.length - 1) {
-      const rectangle = getSegmentAverage(arrayOfGlucoseEvents[i], arrayOfGlucoseEvents[i+1]);
+export const getTimeWeightedMean = (glucoseEvents) => {
+  const sumOfGlucodeDurationProducts = getSumOfGlucodeDurationProducts(glucoseEvents);
+  const eventsDuration = getGlucoseEventsDuration(glucoseEvents);
 
-      arrayOfRectangleSums.push(rectangle);
-    }
-  });
-
-  const sumOfRectanges = arrayOfRectangleSums.reduce((cumulativeSum, rectangleSum) => (
-    cumulativeSum + rectangleSum
-  ), 0);
-
-  const timeDifference = arrayOfGlucoseEvents[arrayOfGlucoseEvents.length - 1].timestamp - arrayOfGlucoseEvents[0].timestamp;
-
-  return sumOfRectanges / timeDifference;
+  return sumOfGlucodeDurationProducts / eventsDuration;
 }
 
-const getSegmentAverage = (firstGlucoseEvent, secondGlucoseEvent) => {
-  const average = (secondGlucoseEvent.glucose + firstGlucoseEvent.glucose) / 2;
-  const period = secondGlucoseEvent.timestamp - firstGlucoseEvent.timestamp;
+const getSumOfGlucodeDurationProducts = glucoseEvents => {
+  const stepWiseEvents = getStepWiseArray(glucoseEvents);
 
-  return average * period;
+  return stepWiseEvents.reduce((cumulativeSum, { start, end }) => cumulativeSum + getGlucodeDurationProduct(start, end), 0);
 };
+
+const getGlucodeDurationProduct = (firstGlucoseEvent, secondGlucoseEvent) => {
+  const glucoseAverage = (secondGlucoseEvent.glucose + firstGlucoseEvent.glucose) / 2;
+  const stepDuration = secondGlucoseEvent.timestamp - firstGlucoseEvent.timestamp;
+
+  return glucoseAverage * stepDuration;
+};
+
+const getGlucoseEventsDuration = glucoseEvents => (
+  glucoseEvents[glucoseEvents.length - 1].timestamp - glucoseEvents[0].timestamp
+);
