@@ -1,31 +1,70 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Card, Form } from 'semantic-ui-react';
-import { post } from 'axios';
+import axios from 'axios';
 
-class FormsPage extends React.Component {
+class FormsPage extends Component {
   state = {
-    value: '',
     file: '',
   };
 
-  // Submit form details and file to express server to process
-  // If processing successful, then prompt user's MetaMask to send data to IPFS
+  /**
+  * Submit form details and file to express server to parse.
+  *
+  * If processing successful, then upload the parsed data to IPFS.
+  */
   onFormSubmit = async (event) => {
     event.preventDefault();
 
     const response = await this.uploadFile(this.state.file);
 
-    console.log(response);
+    // Upload parsed data to IPFS
+    this.uploadToIpfs(response.data);
   };
 
-  // Function to change file when user uploads a new file
+  /**
+  * Upload parsed data to IPFS via infura.
+  */
+  uploadToIpfs = async (parsedData) => {
+    var formData = new FormData();
+    formData.append("file", JSON.stringify(parsedData));
+
+    const url = 'https://ipfs.infura.io:5001/api/v0/add';
+    const config = {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        }
+    }
+
+    try {
+      const response = await axios.post(url, formData, config);
+      const ipfsHash = response.data.Hash;
+
+      this.uploadIPFSHash(ipfsHash);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  /**
+  * Upload IPFS hash of parsed data to dPanc contract on Ethereum network.
+  */
+  uploadIPFSHash = async (ipfsHash) => {
+    console.log(`Uploading ${ipfsHash} to dPanc contract...`);
+    // TODO: Finish and deploy contract, and upload IPFS hash to contract here
+  };
+
+  /**
+  * Function to save file state when user uploads a new file.
+  */
   onChange = (event) => {
     this.setState({
       file: event.target.files[0],
     })
   };
 
-  // Make post call with FormData to express server
+  /**
+  * Post FormData to express server
+  */
   uploadFile = (file) => {
     const url = 'http://localhost:3001/upload/';
     const formData = new FormData();
@@ -36,7 +75,7 @@ class FormsPage extends React.Component {
             'Access-Control-Allow-Origin': '*',
         }
     }
-    return post(url, formData, config)
+    return axios.post(url, formData, config)
   };
 
   render() {
@@ -61,7 +100,7 @@ class FormsPage extends React.Component {
         </Card.Content>
       </Card>
     );
-  }
+  };
 };
 
 export default FormsPage;
