@@ -3,46 +3,31 @@ pragma experimental ABIEncoderV2;
 
 contract dPanc {
 
-  event Upload (
+  event UserRegister (
     address indexed _from,
-    string _date,
-    string _hash
+    string _dbAddress
   );
 
-  struct FileMetadata {
-      string hash;
+  struct UserDb {
       bool exists;
+      string dbAddress;
   }
 
-  struct UserDataStore {
-    mapping(string => FileMetadata) dateToHash;
-    string[] datesByMonthList;
+  mapping(address => UserDb) addressToDb;
+
+  function registerUser(string _dbAddress) public {
+      UserDb storage userDb = addressToDb[msg.sender];
+
+      // Error if user address already has db address saved
+      require(!userDb.exists, 'user-db-already-exists');
+
+      userDb.dbAddress = _dbAddress;
+      userDb.exists = true;
+
+      emit UserRegister(msg.sender, _dbAddress);
   }
 
-  mapping(address => UserDataStore) addressToUserDataStore;
-
-  /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
-  /// @param _hash IPFS hash of data corresponding to _date
-  function saveHash(string _date, string _hash) public {
-    UserDataStore storage userDataStore = addressToUserDataStore[msg.sender];
-    if (!userDataStore.dateToHash[_date].exists) {
-      userDataStore.datesByMonthList.push(_date);
-      userDataStore.dateToHash[_date].exists = true;
-    }
-
-    userDataStore.dateToHash[_date].hash = _hash;
-
-    emit Upload(msg.sender, _date, _hash);
-  }
-
-  /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
-  /// @return hash IPFS hash of data corresponding to _date
-  function getHash(string _date) public view returns (string hash) {
-      return addressToUserDataStore[msg.sender].dateToHash[_date].hash;
-  }
-
-  /// @return list of dates that have IPFS hashes
-  function getUploadedDates() public view returns (string[] dates) {
-      return addressToUserDataStore[msg.sender].datesByMonthList;
+  function getDbAddress() public view returns (string) {
+      return addressToDb[msg.sender].dbAddress;
   }
 }
