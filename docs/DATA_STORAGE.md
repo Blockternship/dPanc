@@ -10,24 +10,32 @@ You give IPFS the data content to save, and it returns a hash (of the data conte
 
 Giving two data files that contain the same content will return the same hash.
 
-### Ethereum Contract to Store IPFS Hash Metadata
+### OrbitDB
+
+OrbitDB is a distributed peer-to-peer database that leverages IPFS as data storage.
+
+The fundamental challenge with IPFS is that modifying the data content will result in a different key generated, so it is not suitable for updating information. OrbitDB eliminates this challenge by building a layer on top of IPFS to manage the mappings internally.
+
+Creating an OrbitDB database will give an address that you use in further operations (this address will not change as the data changes).
+
+We will leverage OrbitDB to assign each user their own OrbitDB database.
+
+### Ethereum Contract to Store OrbitDB Database Address
 
 User data is not stored directly on the Ethereum blockchain as it not suited for big data storage.
 
-An Etheruem contract will be deployed to maintain the IPFS hash metadata of a user's store and the global store.
+An Etheruem contract will be deployed to track the user's OrbitDB database address by Ethereum address.
 
 ### End-to-End Flow
 
 **"date" for MVP refers to a month (YYYY-MM) since we require a whole month's data to be uploaded at once**
 
 1. User fills out upload form with time series data file attached
-2. Get formatted date of data (YYYY-MM) to use as the key later
-3. Convert data file to buffer
-4. Send buffered file to IPFS via Infura
-5. IPFS returns hash identifying the uploaded file
-6. Add pin to returned hash so it does not get garbage collected
-7. Get user's Ethereum address from MetaMask
-8. Save user address, formatted date, and IPFS hash to dPanc Ethereum contract
+2. Determine data formatted date YYYY-MM
+3. Check dPanc contract to see if user has an OrbitDB address already
+    1. If user db address does not exist in contract, then create an OrbitDB db with name as keccak256 hash of user's ETH address and save in contract (requires a transaction)
+    2. If user db address exists in contract, then use the address to open OrbitDB db
+4. Save user data with key as the formatted date in OrbitDB
 
 ### Data Model
 
@@ -49,89 +57,47 @@ The list of data points (timestamp + value) are under a `glucose` key as we may 
 **"date" for MVP refers to a month (YYYY-MM) since we require a whole month's data to be uploaded at once**
 
 ```
+pragma solidity ^0.4.24;
+pragma experimental ABIEncoderV2;
+
 contract dPanc {
-  // TODO: events
 
-  mapping(address => UserDataStore) public addressToUserDataStore;
+  event UserRegister (
+    address indexed _from,
+    string _dbAddress
+  );
 
-  /// @param _addr Address of the user
-  /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
-  /// @param _hash IPFS hash of data corresponding to _date
-  function saveFileHash(address _addr, string _date, string _hash) public {
-    addressToUserDataStore[_addr].saveFileHash(_date, _hash);
-  }
-}
-
-contract UserDataStore {
-  // TODO: events
-
-  struct FileMetadata {
-      string hash;
+  struct UserDb {
       bool exists;
+      string dbAddress;
   }
 
-  mapping(string => FileMetadata) dateToHash;  // maps date (YYYY-MM) to FileMetadata struct containing hash and exists bool
-  string[] public datesByMonthList;   // holds all dates that user has uploaded data to allow entire history retrieval
+  mapping(address => UserDb) addressToDb;
 
-  /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
-  /// @param _hash IPFS hash of data corresponding to _date
-  function saveFileHash(string _date, string _hash) public {
-    // Add date to datesByMonthList if first time seeing given date
-    if (!dateToHash[_date].exists) {
-      datesByMonthList.push(_date);
-    }
+  function registerUser(string _dbAddress) public {
+      UserDb storage userDb = addressToDb[msg.sender];
 
-    dateToHash[_date].hash = _hash;
+      // Error if user address already has db address saved
+      require(!userDb.exists, 'user-db-already-exists');
+
+      userDb.dbAddress = _dbAddress;
+      userDb.exists = true;
+
+      emit UserRegister(msg.sender, _dbAddress);
   }
 
-  /// @param _date Formatted month date (YYYY-MM) of user's uploaded data
-  /// @return hash IPFS hash of data corresponding to _date
-  function getFileHash(string _date) public view returns (string hash) {
-      return dateToHash[_date].hash;
+  function getDbAddress() public view returns (string) {
+      return addressToDb[msg.sender].dbAddress;
   }
 }
 ```
 
 ### Data Retrieval
 
-#### Retrieving Entire History of a User
+#### Retrieving Last X Months
 
-**"date" for MVP refers to a month (YYYY-MM) since we require a whole month's data to be uploaded at once**
+Since we are limiting data storage to a monthly basis for the MVP, we can derive the keys based on the query.
 
-To retrieve the entire history of a user, we can do a lookup by the user's Ethereum address to get the user's `UserDataStore` object.
+Ex. If we want the past 3 months worth of data and this month's date is 2018-10, then we will be retrieving data for the keys `2018-10`, `2018-09`, and `2018-08`.
 
-Then we can get all the dates that the user has uploaded data in the `datesByMonthList` list.
-
-For each date in the `datesByMonthList`, we can call `getFileHash` with the date to get that date's IPFS hash.
-
-Finally, we query IPFS with the hash to retrieve the data points.
-
-### Global Data Store (TBD)
-This one's tough...
-
-The fundamental challenge is figuring out how and when to upload user data to the big data store while minimizing data duplication and keeping retrieval straightforward.
-
-Ideally a data file in the big data store would contain data points from multiple people.
-
-The current design allows users to re-upload and overwrite a month's dataset. This is simple to implement in the user data store by using a mapping of month date to IPFS hash, but difficult to implement in the big data store.
-
-If we want to keep this feature of allowing users to re-upload a month's data (a BIG "if"), then we would need to implement some form of punishment such as exponentially increasing cost when re-uploading to prevent bad actors from uploading bad data.
-
-If users cannot re-upload a month's data, then there is no issue and we do not need to do anything special in the big data store to handle duplicates.
-
-<br>
-
-### Post-MVP: Use IPNS ?
-
-IPNS enhances IPFS by providing the ability to modify/write to a single constant key repeatedly. The fundamental barrier with IPFS is that the key (IPFS hash) is a hash of the value itself so changing the value will result in a different key (IPFS hash). This makes it difficult to update existing data as you need to keep track of a new key after every change.
-
-With IPNS, we do not need to constantly keep track of a new key after every change to the value as IPNS handles it for us. IPNS exhibits functionality similar to if we were writing to a key/value database or using DNS (domain name service).
-
-IPNS allows us to implement data storage as if we were using a database.
-
-*User Metadata Document*
-Each user will be assigned an unique IPNS name that maps to a JSON document containing the metadata for the user. This document will include some basic information about the user such a what year they were born, where they are from, etc. More importantly, this document will contain a list of IPFS hashes `dataHashes` where each hash maps to an entire month's worth of the user's data.
-
-To retrieve a user's entire history, you would have to first retrieve the user's metadata document by IPNS hash, and then fetch the data from each IPFS hash in the `dataHashes` list.
-
-*Global Big Data Metadata Document*
+There is a challenge with this approach as we must make a separate query for each month.
