@@ -28,3 +28,5 @@ app.post('/upload', upload.any(), orbitdb_controller.uploadToDb);
 app.get('/get', orbitdb_controller.getData);
 
 app.post('/create', upload.any(), orbitdb_controller.createDb);
+
+app.post('/getDailyStats', upload.any(), data_controller.getDailyStats);

@@ -3,10 +3,6 @@ import './App.css';
 import FormsPage from './Form';
 import web3 from './../ethereum/web3';
 import { Container, Message } from 'semantic-ui-react';
-import HighchartsContainer from './HighchartsContainer';
-import { columnChartConfig } from './../examples/column-chart-config';
-import { solidGuageConfig } from './../examples/solid-guage-config';
-import ReactHighcharts from 'react-highcharts';
 
 class App extends Component {
   state = {
@@ -70,14 +66,9 @@ class App extends Component {
           address={this.state.address || ''}
           disabled={!!this.state.error}
         />
-        <HighchartsContainer config={columnChartConfig} />
-        <HighchartsContainer config={solidGuageConfig} />
       </Container>
     );
   }
 }
-
-require("highcharts/js/highcharts-more")(ReactHighcharts.Highcharts);
-require("highcharts/js/modules/solid-gauge.js")(ReactHighcharts.Highcharts);
 
 export default App;

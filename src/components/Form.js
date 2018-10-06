@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
-import { Card, Form } from 'semantic-ui-react';
+import { Card, Container, Dimmer, Form, Loader, Segment } from 'semantic-ui-react';
 import axios from 'axios';
 import dPanc from './../ethereum/dPanc';
 import web3 from './../ethereum/web3';
+import HighchartsContainer from './HighchartsContainer';
 
 class FormsPage extends Component {
+
   state = {
     file: '',
+    loadingText: '',
   };
 
   /**
@@ -26,6 +29,11 @@ class FormsPage extends Component {
   onFormSubmit = async (event) => {
     event.preventDefault();
 
+    // Set dimmer & loading icon
+    this.setState({
+      loadingText: 'Parsing data...',
+    })
+
     const response = await this.parseData(this.state.file);
     const { parsedData, date } = response.data;
 
@@ -34,6 +42,8 @@ class FormsPage extends Component {
 
     // if dbAddress does not exist, then we will register the user
     if (!dbAddress) {
+      this.setState({ loadingText: 'Creating a database and registering user to dPanc contract...' })
+
       const dbName = web3.utils.keccak256(this.props.address);
       console.log(dbName);
       const response = await axios.post("http://localhost:3001/create/", {dbName});
@@ -44,16 +54,119 @@ class FormsPage extends Component {
     }
 
     // Upload data to db
-    const resp = await axios.post('http://localhost:3001/upload/', {
+    this.setState({ loadingText: 'Uploading data to database...' })
+    await axios.post('http://localhost:3001/upload/', {
       dbAddress,
       key: date,
       data: parsedData,
     });
 
-    console.log(resp);
+    this.setState({
+      loadingText: 'Done! Redirecting to Dashboard...',
+    });
+
+    setTimeout(() => {
+      this.renderGraphs(parsedData);
+    }, 1000);
 
     // TODO: Route user to Dashboard page with 'parsedData' to render graphs
     // this.props.router.push(...)
+  };
+
+  // TODO: Move to dashboard page
+  renderGraphs = async (parsedData) => {
+    this.setState({
+      loadingText: '',
+    });
+
+    const statsResp = await axios.post('http://localhost:3001/getDailyStats', {
+      data: parsedData
+    });
+
+    let avgSeries = [{ name: 'Blood Glucose', data: statsResp.data.averages }];
+    let minSeries = [{ name: 'Blood Glucose', data: statsResp.data.mins }];
+    let maxSeries = [{ name: 'Blood Glucose', data: statsResp.data.maxs }];
+
+    let avgGraphConfigs = {
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: 'Daily Average Glucose'
+      },
+      xAxis: {
+          type: 'datetime',
+          dateTimeLabelFormats: { // don't display the dummy year
+              month: '%e. %b',
+          },
+          title: {
+              text: 'Date'
+          }
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Blood Glucose (mg/dL)'
+        }
+      },
+      series: avgSeries
+    };
+
+    let minGraphConfigs = {
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: 'Daily Min Glucose'
+      },
+      xAxis: {
+          type: 'datetime',
+          dateTimeLabelFormats: { // don't display the dummy year
+              month: '%e. %b',
+          },
+          title: {
+              text: 'Date'
+          }
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Blood Glucose (mg/dL)'
+        }
+      },
+      series: minSeries
+    };
+
+    let maxGraphConfigs = {
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: 'Daily Max Glucose'
+      },
+      xAxis: {
+          type: 'datetime',
+          dateTimeLabelFormats: { // don't display the dummy year
+              month: '%e. %b',
+          },
+          title: {
+              text: 'Date'
+          }
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Blood Glucose (mg/dL)'
+        }
+      },
+      series: maxSeries
+    };
+
+    this.setState({
+      avgGraph: <HighchartsContainer config={avgGraphConfigs} />,
+      minGraph: <HighchartsContainer config={minGraphConfigs}/>,
+      maxGraph: <HighchartsContainer config={maxGraphConfigs}/>
+    })
   };
 
   /**
@@ -85,25 +198,37 @@ class FormsPage extends Component {
 
   render() {
     return(
-      <Card>
-        <Card.Content>
-          <Form onSubmit={this.onFormSubmit}>
-            <Form.Field required>
-              <label>ETH address</label>
-              <input value={this.props.address} disabled />
-            </Form.Field>
-            <Form.Field required>
-              <label>Device</label>
-              <input value="FreeStyle Libre" disabled />
-            </Form.Field>
-            <Form.Field required>
-              <label>Upload Data</label>
-              <input required type="file" onChange={this.onChange} />
-            </Form.Field>
-            <Form.Button primary disabled={this.props.disabled}>Submit</Form.Button>
-          </Form>
-        </Card.Content>
-      </Card>
+      <Container>
+        <Segment basic>
+          <Dimmer active={!!this.state.loadingText}>
+            <Loader>{this.state.loadingText}</Loader>
+          </Dimmer>
+          <Card centered>
+            <Card.Content>
+              <Form onSubmit={this.onFormSubmit}>
+                <Form.Field required>
+                  <label>ETH address</label>
+                  <input value={this.props.address} disabled />
+                </Form.Field>
+                <Form.Field required>
+                  <label>Device</label>
+                  <input value="FreeStyle Libre" disabled />
+                </Form.Field>
+                <Form.Field required>
+                  <label>Upload Data</label>
+                  <input required type="file" onChange={this.onChange} />
+                </Form.Field>
+                <Form.Button primary disabled={this.props.disabled}>Submit</Form.Button>
+              </Form>
+            </Card.Content>
+          </Card>
+        </Segment>
+        <Segment basic>
+          {this.state.avgGraph}
+          {this.state.minGraph}
+          {this.state.maxGraph}
+        </Segment>
+      </Container>
     );
   };
 };
