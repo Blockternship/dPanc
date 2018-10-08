@@ -15,6 +15,7 @@ import Dashboard from './Dashboard';
 import Research from './Research';
 import Contact from './Contact';
 import Nav from './Nav';
+import { Container, Message } from 'semantic-ui-react';
 
 
 class App extends Component {
@@ -100,11 +101,14 @@ class App extends Component {
           address={this.state.address || ''}
           disabled={!!this.state.error}
         />
-        </Container>
-
-
 
         </Container>
+
+
+
+      </Container>
+
+
 
     );
   }
