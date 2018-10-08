@@ -49,6 +49,7 @@ class FormsPage extends Component {
       const response = await axios.post("http://localhost:3001/create/", {dbName});
       dbAddress = response.data;
 
+
       // Save dbAddress to contract
       await this.saveDbAddressToContract(dbAddress);
     }
@@ -197,6 +198,8 @@ class FormsPage extends Component {
   };
 
   render() {
+      console.log('Forms Page')
+      console.log(this.props)
     return(
       <Container>
         <Segment basic>

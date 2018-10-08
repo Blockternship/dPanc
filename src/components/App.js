@@ -15,7 +15,6 @@ import Dashboard from './Dashboard';
 import Research from './Research';
 import Contact from './Contact';
 import Nav from './Nav';
-import { Container, Message } from 'semantic-ui-react';
 
 
 class App extends Component {
@@ -77,7 +76,8 @@ class App extends Component {
             <div>
               <Nav />
               <Switch>
-                <Route exactly component={Dashboard} path="/dashboard" />
+                <Route path='/form' render={(props) => <FormsPage {...props} isAuthed={true} address={this.state.address || ''} disabled={!!this.state.error}/>}/>
+                <Route path="/dashboard" render={(props) => <Dashboard {...props} isAuthed={true}/>}/>
                 <Route exactly component={Research} path="/research" />
                 <Route exactly component={Contact} path="/contact" />
               </Switch>
@@ -97,10 +97,6 @@ class App extends Component {
           <Message.Header>{this.state.error}</Message.Header>
         </Message>
         <p className="App-intro">{this.state.response}</p>
-        <FormsPage
-          address={this.state.address || ''}
-          disabled={!!this.state.error}
-        />
 
         </Container>
 
