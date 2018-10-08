@@ -3,7 +3,6 @@ import { Card, Container, Dimmer, Form, Loader, Segment } from 'semantic-ui-reac
 import axios from 'axios';
 import dPanc from './../ethereum/dPanc';
 import web3 from './../ethereum/web3';
-import HighchartsContainer from './HighchartsContainer';
 
 class FormsPage extends Component {
 
@@ -49,7 +48,6 @@ class FormsPage extends Component {
       const response = await axios.post("http://localhost:3001/create/", {dbName});
       dbAddress = response.data;
 
-
       // Save dbAddress to contract
       await this.saveDbAddressToContract(dbAddress);
     }
@@ -67,107 +65,15 @@ class FormsPage extends Component {
     });
 
     setTimeout(() => {
-      this.renderGraphs(parsedData);
+      this.setState({
+        loadingText: '',
+      });
+
+      this.props.history.push({
+        pathname: '/dashboard',
+        state: { parsedData }
+      });
     }, 1000);
-
-    // TODO: Route user to Dashboard page with 'parsedData' to render graphs
-    // this.props.router.push(...)
-  };
-
-  // TODO: Move to dashboard page
-  renderGraphs = async (parsedData) => {
-    this.setState({
-      loadingText: '',
-    });
-
-    const statsResp = await axios.post('http://localhost:3001/getDailyStats', {
-      data: parsedData
-    });
-
-    let avgSeries = [{ name: 'Blood Glucose', data: statsResp.data.averages }];
-    let minSeries = [{ name: 'Blood Glucose', data: statsResp.data.mins }];
-    let maxSeries = [{ name: 'Blood Glucose', data: statsResp.data.maxs }];
-
-    let avgGraphConfigs = {
-      chart: {
-        type: 'column'
-      },
-      title: {
-        text: 'Daily Average Glucose'
-      },
-      xAxis: {
-          type: 'datetime',
-          dateTimeLabelFormats: { // don't display the dummy year
-              month: '%e. %b',
-          },
-          title: {
-              text: 'Date'
-          }
-      },
-      yAxis: {
-        min: 0,
-        title: {
-          text: 'Blood Glucose (mg/dL)'
-        }
-      },
-      series: avgSeries
-    };
-
-    let minGraphConfigs = {
-      chart: {
-        type: 'column'
-      },
-      title: {
-        text: 'Daily Min Glucose'
-      },
-      xAxis: {
-          type: 'datetime',
-          dateTimeLabelFormats: { // don't display the dummy year
-              month: '%e. %b',
-          },
-          title: {
-              text: 'Date'
-          }
-      },
-      yAxis: {
-        min: 0,
-        title: {
-          text: 'Blood Glucose (mg/dL)'
-        }
-      },
-      series: minSeries
-    };
-
-    let maxGraphConfigs = {
-      chart: {
-        type: 'column'
-      },
-      title: {
-        text: 'Daily Max Glucose'
-      },
-      xAxis: {
-          type: 'datetime',
-          dateTimeLabelFormats: { // don't display the dummy year
-              month: '%e. %b',
-          },
-          title: {
-              text: 'Date'
-          }
-      },
-      yAxis: {
-        min: 0,
-        title: {
-          text: 'Blood Glucose (mg/dL)'
-        }
-      },
-      series: maxSeries
-    };
-
-    this.setState({
-      avgGraph: <HighchartsContainer config={avgGraphConfigs} />,
-      minGraph: <HighchartsContainer config={minGraphConfigs}/>,
-      maxGraph: <HighchartsContainer config={maxGraphConfigs}/>
-    })
   };
 
   /**
@@ -198,8 +104,6 @@ class FormsPage extends Component {
   };
 
   render() {
-      console.log('Forms Page')
-      console.log(this.props)
     return(
       <Container>
         <Segment basic>
