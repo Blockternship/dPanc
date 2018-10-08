@@ -2,11 +2,20 @@ import React, { Component } from 'react';
 import './App.css';
 import FormsPage from './Form';
 import web3 from './../ethereum/web3';
-import { Container, Message } from 'semantic-ui-react';
-import HighchartsContainer from './HighchartsContainer';
-import { columnChartConfig } from './../examples/column-chart-config';
-import { solidGuageConfig } from './../examples/solid-guage-config';
-import ReactHighcharts from 'react-highcharts';
+import logo from './logo.png';
+import { Container, Message, Menu, Dropdown, Image, Header } from 'semantic-ui-react';
+import {
+  Route,
+  Link,
+  Switch,
+  BrowserRouter as Router,
+  Redirect
+} from 'react-router-dom';
+import Dashboard from './Dashboard';
+import Research from './Research';
+import Contact from './Contact';
+import Nav from './Nav';
+
 
 class App extends Component {
   state = {
@@ -57,11 +66,66 @@ class App extends Component {
         address: address[0],
       });
     }
+
+  // const Nav = props => (
+  // <NavLink
+  //   exact
+  //   {...props}
+  //   activeClassName="active"
+  //   />
+  //  );
+
+  // <Route path="/research" component={Research} />
+  // <Route path="/contact" component={Contact} />
+  // <Route path="/Insights" component={Dashboard} />
+  // <Menu fixed='top' inverted>
+  //        <Container>
+  //          <Menu.Item as='a' header>
+  //            <Image size='mini' src={logo} style={{ marginRight: '1.5em' }} />
+  //            dPanc
+  //          </Menu.Item>
+  //          <Menu.Item as={Link} to="/research">Research</Menu.Item>
+  //          <Menu.Item as={Link} to="/contact">Contact</Menu.Item>
+
+
+
+
+   //         <Dropdown item simple text='Dashboard'>
+   //           <Dropdown.Menu>
+   //             <Dropdown.Item as={Link} to="/Insights">Insights</Dropdown.Item>
+   //             <Dropdown.Item>Historical Analysis</Dropdown.Item>
+
+
+  //            </Dropdown.Menu>
+  //          </Dropdown>
+  //        </Container>
+  //     </Menu>
   };
 
   render() {
     return (
+
       <Container>
+        <Router>
+            <div>
+              <Nav />
+              <Switch>
+                <Route exactly component={Dashboard} path="/dashboard" />
+                <Route exactly component={Research} path="/research" />
+                <Route exactly component={Contact} path="/contact" />
+              </Switch>
+            </div>
+        </Router>
+
+
+        <Container text style={{ marginTop: '7em' }}>
+          <Header as='h1'>dPanc</Header>
+          <p>This is a basic fixed menu template using fixed size containers.</p>
+          <p>
+            A text container is used for the main container, which is useful for single column layouts.
+          </p>
+
+
         <Message negative visible={!!this.state.error} hidden={!this.state.error}>
           <Message.Header>{this.state.error}</Message.Header>
         </Message>
@@ -70,14 +134,14 @@ class App extends Component {
           address={this.state.address || ''}
           disabled={!!this.state.error}
         />
-        <HighchartsContainer config={columnChartConfig} />
-        <HighchartsContainer config={solidGuageConfig} />
-      </Container>
+        </Container>
+
+
+
+        </Container>
+
     );
   }
 }
-
-require("highcharts/js/highcharts-more")(ReactHighcharts.Highcharts);
-require("highcharts/js/modules/solid-gauge.js")(ReactHighcharts.Highcharts);
 
 export default App;
