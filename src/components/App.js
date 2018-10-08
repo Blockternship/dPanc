@@ -15,7 +15,6 @@ import Dashboard from './Dashboard';
 import Research from './Research';
 import Contact from './Contact';
 import Nav from './Nav';
-import { Container, Message } from 'semantic-ui-react';
 
 
 class App extends Component {
