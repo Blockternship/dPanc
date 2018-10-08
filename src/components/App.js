@@ -66,40 +66,6 @@ class App extends Component {
         address: address[0],
       });
     }
-
-  // const Nav = props => (
-  // <NavLink
-  //   exact
-  //   {...props}
-  //   activeClassName="active"
-  //   />
-  //  );
-
-  // <Route path="/research" component={Research} />
-  // <Route path="/contact" component={Contact} />
-  // <Route path="/Insights" component={Dashboard} />
-  // <Menu fixed='top' inverted>
-  //        <Container>
-  //          <Menu.Item as='a' header>
-  //            <Image size='mini' src={logo} style={{ marginRight: '1.5em' }} />
-  //            dPanc
-  //          </Menu.Item>
-  //          <Menu.Item as={Link} to="/research">Research</Menu.Item>
-  //          <Menu.Item as={Link} to="/contact">Contact</Menu.Item>
-
-
-
-
-   //         <Dropdown item simple text='Dashboard'>
-   //           <Dropdown.Menu>
-   //             <Dropdown.Item as={Link} to="/Insights">Insights</Dropdown.Item>
-   //             <Dropdown.Item>Historical Analysis</Dropdown.Item>
-
-
-  //            </Dropdown.Menu>
-  //          </Dropdown>
-  //        </Container>
-  //     </Menu>
   };
 
   render() {
