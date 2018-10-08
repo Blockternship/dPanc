@@ -2,14 +2,11 @@ import React, { Component } from 'react';
 import './App.css';
 import FormsPage from './Form';
 import web3 from './../ethereum/web3';
-import logo from './logo.png';
-import { Container, Message, Menu, Dropdown, Image, Header } from 'semantic-ui-react';
+import { Container, Message, Header } from 'semantic-ui-react';
 import {
   Route,
-  Link,
   Switch,
   BrowserRouter as Router,
-  Redirect
 } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Research from './Research';
