@@ -7,7 +7,10 @@ import { Container, Message, Menu, Dropdown, Image, Header } from 'semantic-ui-r
 
 class Dashboard extends Component {
 
+
 render() {
+  console.log(this.props);
+  console.log('dashboard');
     return (
   <Container>
   <HighchartsContainer config={columnChartConfig} />
