@@ -3,18 +3,20 @@ import HighchartsContainer from './HighchartsContainer';
 import ReactHighcharts from 'react-highcharts';
 import { columnChartConfig } from './../examples/column-chart-config';
 import { solidGuageConfig } from './../examples/solid-guage-config';
-import { Container, Message, Menu, Dropdown, Image, Header } from 'semantic-ui-react';
+import { Container, Message, Menu, Dropdown, Image, Header, Segment } from 'semantic-ui-react';
 
 class Dashboard extends Component {
 
 
 render() {
-  console.log(this.props);
-  console.log('dashboard');
+  // console.log(this.props);
+  // console.log('dashboard');
     return (
-  <Container>
+  <Container style={{ marginTop: '7em' }}>
+  <Segment basic>
   <HighchartsContainer config={columnChartConfig} />
   <HighchartsContainer config={solidGuageConfig} />
+  </Segment>
   </Container>
     )
   }

@@ -198,10 +198,8 @@ class FormsPage extends Component {
   };
 
   render() {
-      console.log('Forms Page')
-      console.log(this.props)
     return(
-      <Container>
+      <Container style={{ marginTop: '7em' }}>
         <Segment basic>
           <Dimmer active={!!this.state.loadingText}>
             <Loader>{this.state.loadingText}</Loader>
