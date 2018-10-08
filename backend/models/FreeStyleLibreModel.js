@@ -1,6 +1,9 @@
 module.exports = function FreeStyleLibreModel(csv_data) {
   let model = {
-    glucose: [],
+    parsedData: {
+      glucose: [],
+    },
+    date: "",
   };
 
   var historicCount = 0,
@@ -15,15 +18,20 @@ module.exports = function FreeStyleLibreModel(csv_data) {
         scanGlucose = columns[5];
 
     if (!!historicGlucose) {
-      model.glucose.push([
+      model.parsedData.glucose.push([
         timestamp,
         historicGlucose,
       ]);
     } else if (!!scanGlucose) {
-      model.glucose.push([
+      model.parsedData.glucose.push([
         timestamp,
         scanGlucose,
       ]);
+    }
+
+    // Parse month from the data
+    if (timestamp) {
+      model.date = `${timestamp.slice(0,2)}-${timestamp.slice(6,10)}`;
     }
   });
 
