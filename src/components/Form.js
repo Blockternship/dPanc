@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Container, Dimmer, Form, Loader, Segment } from 'semantic-ui-react';
+import { Card, Container, Dimmer, Form, Loader, Message, Segment } from 'semantic-ui-react';
 import axios from 'axios';
 import dPanc from './../ethereum/dPanc';
 import web3 from './../ethereum/web3';
@@ -32,20 +32,20 @@ class FormsPage extends Component {
       this.setState({
         error: 'Could not detect MetaMask. Please make sure MetaMask is enabled!'
       });
-    };
-
-    const address = await web3.eth.getAccounts();
-
-    if (address.length === 0) {
-      console.log('Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.');
-      this.setState({
-        error: 'Could not fetch accounts from MetaMask! Make sure you are logged into MetaMask.',
-      });
     } else {
-      this.setState({
-        disabled: false,
-        address: address[0],
-      });
+      const address = await web3.eth.getAccounts();
+
+      if (address.length === 0) {
+        console.log('Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.');
+        this.setState({
+          error: 'Could not fetch accounts from MetaMask! Make sure you are logged into MetaMask.',
+        });
+      } else {
+        this.setState({
+          disabled: false,
+          address: address[0],
+        });
+      }
     }
   };
 
@@ -123,7 +123,7 @@ class FormsPage extends Component {
   saveDbAddressToContract = async (dbAddress) => {
     console.log(`Saving ${dbAddress} to contract...`);
 
-    const response = await dPanc.methods.registerUser(dbAddress).send({from: this.props.address});
+    const response = await dPanc.methods.registerUser(dbAddress).send({from: this.state.address});
 
     console.log(response);
   };
@@ -131,11 +131,14 @@ class FormsPage extends Component {
   render() {
     return(
       <Container style={{ marginTop: '7em' }}>
+        <Message negative hidden={!this.state.error}>
+          <Message.Header>{this.state.error}</Message.Header>
+        </Message>
         <Segment basic>
-          <Dimmer active={!!this.state.loadingText}>
-            <Loader>{this.state.loadingText}</Loader>
-          </Dimmer>
           <Card centered>
+            <Dimmer active={!!this.state.loadingText}>
+              <Loader>{this.state.loadingText}</Loader>
+            </Dimmer>
             <Card.Content>
               <Form onSubmit={this.onFormSubmit}>
                 <Form.Field required>

@@ -63,7 +63,9 @@ class Dashboard extends Component {
 
   async componentDidMount() {
     await this.getAccountAddress();
-    this.renderGraphs();
+    if (web3) {
+      this.renderGraphs();
+    }
   }
 
   getAccountAddress = async () => {
@@ -72,19 +74,19 @@ class Dashboard extends Component {
       this.setState({
         error: 'Could not detect MetaMask. Please make sure MetaMask is enabled!'
       });
-    };
-
-    const address = await web3.eth.getAccounts();
-
-    if (address.length === 0) {
-      console.log('Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.');
-      this.setState({
-        error: 'Could not fetch accounts from MetaMask! Make sure you are logged into MetaMask.',
-      });
     } else {
-      this.setState({
-        address: address[0],
-      });
+      const address = await web3.eth.getAccounts();
+
+      if (address.length === 0) {
+        console.log('Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.');
+        this.setState({
+          error: 'Could not fetch accounts from MetaMask! Make sure you are logged into MetaMask.',
+        });
+      } else {
+        this.setState({
+          address: address[0],
+        });
+      }
     }
   };
 
@@ -172,12 +174,16 @@ class Dashboard extends Component {
   onChangeDateOption = (event, data) => {
     event.preventDefault();
 
-    if (data.value !== this.state.lookbackMonths) {
-      this.setState({
-        error: '',
-        lookbackMonths: data.value,
-      });
-      this.renderGraphs();
+    this.props.location.state = null;
+
+    if (web3) {
+      if (data.value !== this.state.lookbackMonths) {
+        this.setState({
+          error: '',
+          lookbackMonths: data.value,
+        });
+        this.renderGraphs();
+      }
     }
   };
 
