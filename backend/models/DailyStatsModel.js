@@ -48,8 +48,7 @@ module.exports = function DailyStatsModel(data) {
         average = Math.round(total/count);
 
     model.averages.push(
-      [Date.UTC(year, month, day), average]
-      // [new Date(year, month, day).toUTCString(), average]
+      [Date.UTC(year, month - 1, day), average],
     );
   });
 
@@ -59,7 +58,7 @@ module.exports = function DailyStatsModel(data) {
         month = key.slice(0, 2),
         day = key.slice(3,5);
     model.mins.push(
-      [Date.UTC(year, month, day), min[key]]
+      [Date.UTC(year, month - 1, day), min[key]]
     );
   });
 
@@ -69,7 +68,7 @@ module.exports = function DailyStatsModel(data) {
         month = key.slice(0, 2),
         day = key.slice(3,5);
     model.maxs.push(
-      [Date.UTC(year, month, day), max[key]]
+      [Date.UTC(year, month - 1, day), max[key]]
     );
   });
 
