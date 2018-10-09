@@ -25,7 +25,9 @@ app.post('/parse', upload.any(), data_controller.parseCSV);
 
 app.post('/upload', upload.any(), orbitdb_controller.uploadToDb);
 
-app.get('/get', orbitdb_controller.getData);
+app.post('/get', upload.any(), orbitdb_controller.getData);
+
+app.post('/getDataByKeys', upload.any(), orbitdb_controller.getDataByKeys);
 
 app.post('/create', upload.any(), orbitdb_controller.createDb);
 

@@ -50,7 +50,7 @@ exports.uploadToDb = async function(req, res) {
     console.log(`Db ${dbAddress} loaded successfully!`);
 
     // Now put data
-    console.log(`Putting data...`);
+    console.log(`Putting data at key=${key}...`);
     await db.put(key, data);
     console.log(`Sucessfully put data!`);
 
@@ -69,7 +69,7 @@ exports.uploadToDb = async function(req, res) {
 * Retrieves a data set from the specified OrbitDB database.
 */
 exports.getData = async function(req, res) {
-  const { dbAddress, key } = req.query;
+  const { dbAddress, key } = req.body;
 
   const db = await orbitdb.open(dbAddress, {
     replicate: false
@@ -79,8 +79,44 @@ exports.getData = async function(req, res) {
   await db.load();
   console.log(`Db ${dbAddress} loaded successfully!`);
 
+  console.log(`Fetching data at key=${key}...`);
+
   // Now get key
   const value = db.get(key);
 
+  console.log(value);
+
   res.send(value);
 };
+
+exports.getDataByKeys = async function(req, res) {
+  try {
+    const { dbAddress, keys } = req.body;
+
+    const db = await orbitdb.open(dbAddress, {
+      replicate: false
+    });
+
+    console.log(`Loading db ${dbAddress}...`);
+    await db.load();
+    console.log(`Db ${dbAddress} loaded successfully!`);
+
+    const data = {};
+    for (var key of keys) {
+      console.log(`Fetching data at key=${key}...`);
+      const value = db.get(key);
+
+      if (value) {
+        data.glucose = data.glucose ? [...data.glucose, ...value.glucose] : value.glucose;
+      }
+    }
+
+    console.log(data);
+
+    res.send(data);
+  } catch (err) {
+    res.send({
+      error: err.message
+    });
+  }
+}
