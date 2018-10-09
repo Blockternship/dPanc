@@ -69,6 +69,7 @@ class App extends Component {
     return (
 
       <Container>
+
         <Router>
             <div>
               <Nav />
@@ -81,15 +82,7 @@ class App extends Component {
             </div>
         </Router>
 
-
         <Container text style={{ marginTop: '7em' }}>
-          <Header as='h1'>dPanc</Header>
-          <p>This is a basic fixed menu template using fixed size containers.</p>
-          <p>
-            A text container is used for the main container, which is useful for single column layouts.
-          </p>
-
-
         <Message negative visible={!!this.state.error} hidden={!this.state.error}>
           <Message.Header>{this.state.error}</Message.Header>
         </Message>

@@ -105,7 +105,7 @@ class FormsPage extends Component {
 
   render() {
     return(
-      <Container>
+      <Container style={{ marginTop: '7em' }}>
         <Segment basic>
           <Dimmer active={!!this.state.loadingText}>
             <Loader>{this.state.loadingText}</Loader>
