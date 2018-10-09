@@ -24,6 +24,7 @@
     "nodemon": "^1.18.4",
     "orbit-db": "^0.19.9",
     "pre-commit": "^1.2.2",
+    "qrcode-terminal": "^0.12.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-highcharts": "^16.0.2",
@@ -32,6 +33,7 @@
     "react-scripts": "1.1.4",
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.3",
+    "uport-connect": "^1.0.0-alpha-5",
     "web3": "^1.0.0-beta.36"
   },
   "scripts": {
