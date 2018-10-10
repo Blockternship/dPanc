@@ -1,7 +1,6 @@
 var FreeStyleLibreModel = require("../models/FreeStyleLibreModel");
 var DailyStatsModel = require('../models/DailyStatsModel');
 
-
 exports.parseCSV = function(req, res) {
     // Temporary hardcoding to FreeStyle Libre model
     let csvData = req.files[0].buffer.toString();
