@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Button, Card, Container, Dimmer, Form, Loader, Message, Segment } from 'semantic-ui-react';
 import axios from 'axios';
+
 import getWeb3 from './../ethereum/web3';
-import dPanc from './../ethereum/dPanc';
-import Web3 from 'web3';
+import getDPanc from './../ethereum/dPanc';
+import uPortInstance from './../ethereum/uport';
+
 import { Connect } from 'uport-connect';
 const uport = new Connect('dPanc');
-const jsonInterface = require("../ethereum/dPanc.json");
 
 class FormsPage extends Component {
 
@@ -16,10 +17,33 @@ class FormsPage extends Component {
     file: '',
     loadingText: '',
     error: '',
+    provider: null,
+    uPortText: 'Login with uPort',
+    uPortDisabled: false,
   };
 
-  componentDidMount() {
-    this.getAccountAddress();
+  async componentDidMount() {
+    let provider = uPortInstance.getProvider();
+    if (provider) {
+      this.setState({
+        provider,
+      });
+    }
+
+    let state = this.props.location.state;
+    if (state) {
+      const { address, uPortText, uPortDisabled, disabled } = state;
+        await this.setState({
+          address,
+          uPortText,
+          uPortDisabled,
+          disabled,
+        });
+    }
+
+    if (!this.state.address) {
+      this.getAccountAddress();
+    }
   }
 
   /**
@@ -32,7 +56,7 @@ class FormsPage extends Component {
   };
 
   getAccountAddress = async () => {
-    let web3 = getWeb3();
+    let web3 = getWeb3(this.state.provider);
 
     if (!web3) {
       console.log('Could not detect MetaMask.');
@@ -73,20 +97,17 @@ class FormsPage extends Component {
     const { parsedData, date } = response.data;
 
     // Attempt to get user DB address from dPanc contract
-    let web3 = getWeb3();
-    let dPanc = new web3.eth.Contract(jsonInterface.abi,         
-      '0xfa29857ea29515187f3e0c590cdcd8cd0d0bcf02'
-    );
-    console.log('from: ' + this.state.address);
-    var dbAddress = await dPanc.methods.getDbAddress().call({from: this.state.address});
+    let dPanc = getDPanc(this.state.provider);
+    var dbAddress = await dPanc.methods.getDbAddress(this.state.address).call({ from: this.state.address });
 
     // if dbAddress does not exist, then we will register the user
     if (!dbAddress) {
       this.setState({ loadingText: 'Creating a database and registering user to dPanc contract...' })
 
+      let web3 = getWeb3(this.state.provider);
       const dbName = web3.utils.keccak256(this.state.address);
       console.log(dbName);
-      const response = await axios.post("http://localhost:3001/create/", {dbName});
+      const response = await axios.post("http://localhost:3001/create/", { dbName });
       dbAddress = response.data;
 
       // Save dbAddress to contract
@@ -110,11 +131,15 @@ class FormsPage extends Component {
         loadingText: '',
       });
 
+      const { address, uPortText, uPortDisabled } = this.state;
+
       this.props.history.push({
         pathname: '/dashboard',
         state: {
           parsedData,
-          address: this.state.address,
+          address,
+          uPortText,
+          uPortDisabled,
         }
       });
     }, 1000);
@@ -137,24 +162,24 @@ class FormsPage extends Component {
 
   saveDbAddressToContract = async (dbAddress) => {
     console.log(`Saving ${dbAddress} to contract...`);
-
-    const response = await dPanc.methods.registerUser(dbAddress).send({from: this.state.address});
-
-      console.log(response);
+    let dPanc = getDPanc(this.state.provider);
+    const response = await dPanc.methods.registerUser(this.state.address, dbAddress).send({from: this.state.address});
+    console.log(response);
   }
 
   authWithuPort = async () => {
-    // const userProfile = await uport.requestCredentials();
-    // if (userProfile && userProfile.address) {
-    //   console.log(userProfile);
-    //   this.setState({
-    //     disabled: false,
-    //     error: '',
-    //     loadingText: '',
-    //     address: userProfile.address.split(':')[2],
-    //     web3: new Web3(uport.getProvider()),
-    //   });
-    // };
+    await uport.requestDisclosure({});
+    uport.onResponse('disclosureReq').then(res => {
+      let address = res.payload.did.split(':')[2];
+      this.setState({
+        error: '',
+        loadingText: '',
+        address,
+        uPortText: `Logged in as ${address} with uPort!`,
+        uPortDisabled: true,
+      });
+      uPortInstance.saveInstance(uport);
+    });
   };
 
   render() {
@@ -162,8 +187,10 @@ class FormsPage extends Component {
       <Container style={{ marginTop: '7em' }}>
         <Message negative hidden={!this.state.error}>
           <Message.Header>{this.state.error}</Message.Header>
-          <Button primary onClick={this.authWithuPort}>Use uPort</Button>
         </Message>
+        <Segment basic>
+          <Button color='violet' disabled={this.state.uPortDisabled} onClick={this.authWithuPort}>{this.state.uPortText}</Button>
+        </Segment>
         <Segment basic>
           <Card centered>
           <Dimmer active={!!this.state.loadingText}>
