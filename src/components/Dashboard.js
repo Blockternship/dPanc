@@ -3,9 +3,11 @@ import HighchartsContainer from './HighchartsContainer';
 import ReactHighcharts from 'react-highcharts';
 import { Container, Dimmer, Dropdown, Loader, Message, Segment } from 'semantic-ui-react';
 import axios from 'axios';
-import dPanc from './../ethereum/dPanc';
-import web3 from './../ethereum/web3';
+import getWeb3 from './../ethereum/web3';
 import moment from 'moment';
+import { Connect } from 'uport-connect';
+const uport = new Connect('dPanc');
+const jsonInterface = require("../ethereum/dPanc.json");
 
 const dateOptions = [
   {
@@ -63,28 +65,34 @@ class Dashboard extends Component {
 
   async componentDidMount() {
     await this.getAccountAddress();
-    this.renderGraphs();
+
+    let web3 = getWeb3();
+    if (web3) {
+      this.renderGraphs();
+    }
   }
 
   getAccountAddress = async () => {
+    let web3 = getWeb3();
+
     if (!web3) {
       console.log('Could not detect MetaMask.');
       this.setState({
         error: 'Could not detect MetaMask. Please make sure MetaMask is enabled!'
       });
-    };
-
-    const address = await web3.eth.getAccounts();
-
-    if (address.length === 0) {
-      console.log('Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.');
-      this.setState({
-        error: 'Could not fetch accounts from MetaMask! Make sure you are logged into MetaMask.',
-      });
     } else {
-      this.setState({
-        address: address[0],
-      });
+      const address = await web3.eth.getAccounts();
+
+      if (address.length === 0) {
+        console.log('Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.');
+        this.setState({
+          error: 'Could not fetch accounts from MetaMask! Make sure you are logged into MetaMask.',
+        });
+      } else {
+        this.setState({
+          address: address[0],
+        });
+      }
     }
   };
 
@@ -106,6 +114,7 @@ class Dashboard extends Component {
   };
 
   renderGraphs = async () => {
+    let web3 = getWeb3();
     var parsedData = null;
 
     // Get parsed data from
@@ -118,20 +127,26 @@ class Dashboard extends Component {
       this.setState({
         loadingText: 'Fetching data from OrbitDB...'
       })
-      // Attempt to get user DB address from dPanc contract
-      var dbAddress = await dPanc.methods.getDbAddress().call({from: this.state.address});
 
-      if (dbAddress) {
-        let dates = this.getLookbackMonths(this.state.lookbackMonths);
+      // Attempt to get user DB address from dPanc contract      
+      if (web3) {
+        let dPanc = new web3.eth.Contract(jsonInterface.abi,         
+          '0xfa29857ea29515187f3e0c590cdcd8cd0d0bcf02'
+        );
+        var dbAddress = await dPanc.methods.getDbAddress().call({from: this.state.address});
 
-        const resp = await axios.post('http://localhost:3001/getDataByKeys', {
-          dbAddress,
-          keys: dates,
-        });
+        if (dbAddress) {
+          let dates = this.getLookbackMonths(this.state.lookbackMonths);
 
-        if (resp.data.glucose) {
-          parsedData = resp.data;
-        };
+          const resp = await axios.post('http://localhost:3001/getDataByKeys', {
+            dbAddress,
+            keys: dates,
+          });
+
+          if (resp.data.glucose) {
+            parsedData = resp.data;
+          };
+        }
       }
     }
 
@@ -172,12 +187,18 @@ class Dashboard extends Component {
   onChangeDateOption = (event, data) => {
     event.preventDefault();
 
-    if (data.value !== this.state.lookbackMonths) {
-      this.setState({
-        error: '',
-        lookbackMonths: data.value,
-      });
-      this.renderGraphs();
+    this.props.location.state = null;
+    
+    let web3 = getWeb3();
+
+    if (web3) {
+      if (data.value !== this.state.lookbackMonths) {
+        this.setState({
+          error: '',
+          lookbackMonths: data.value,
+        });
+        this.renderGraphs();
+      }
     }
   };
 
