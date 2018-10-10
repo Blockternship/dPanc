@@ -15,8 +15,8 @@ contract dPanc {
 
   mapping(address => UserDb) addressToDb;
 
-  function registerUser(string _dbAddress) public {
-      UserDb storage userDb = addressToDb[msg.sender];
+  function registerUser(address _addr, string _dbAddress) public {
+      UserDb storage userDb = addressToDb[_addr];
 
       // Error if user address already has db address saved
       require(!userDb.exists, 'user-db-already-exists');
@@ -24,10 +24,15 @@ contract dPanc {
       userDb.dbAddress = _dbAddress;
       userDb.exists = true;
 
-      emit UserRegister(msg.sender, _dbAddress);
+      emit UserRegister(_addr, _dbAddress);
   }
 
-  function getDbAddress() public view returns (string) {
-      return addressToDb[msg.sender].dbAddress;
+  function getDbAddress(address _addr) public view returns (string) {
+      return addressToDb[_addr].dbAddress;
+  }
+
+  function deleteUser(address _addr) public {
+      addressToDb[_addr].dbAddress = "";
+      addressToDb[_addr].exists = false;
   }
 }
