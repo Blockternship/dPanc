@@ -3,6 +3,7 @@ module.exports = function DailyStatsModel(data) {
     averages: [],
     mins: [],
     maxs: [],
+    range: [],
   };
 
   // Map of stats by day
@@ -69,6 +70,16 @@ module.exports = function DailyStatsModel(data) {
         day = key.slice(3,5);
     model.maxs.push(
       [Date.UTC(year, month - 1, day), max[key]]
+    );
+  });
+
+  // Add typical range
+  Object.keys(max).forEach(function(key) {
+    let year = key.slice(6,10),
+        month = key.slice(0, 2),
+        day = key.slice(3,5);
+    model.range.push(
+      [Date.UTC(year, month - 1, day), 60.0, 90.0]
     );
   });
 
