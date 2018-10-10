@@ -32,10 +32,15 @@ const dateOptions = [
 
 const graphConfigsTemplate = {
   chart: {
-    type: 'column'
+    type: 'line'
   },
   title: {
     text: ''
+  },
+  tooltip: {
+        crosshairs: true,
+        shared: true,
+        valueSuffix: '°C'
   },
   xAxis: {
       type: 'datetime',
@@ -121,10 +126,35 @@ class Dashboard extends Component {
     }
   };
 
-  getGraphConfigs = (title, series) => {
+  getGraphConfigs = (title, series, range) => {
+    let seriesConfig = [{
+            name: 'Blood Glucose',
+            data: '',
+            zIndex: 1,
+            marker: {
+                fillColor: 'white',
+                lineWidth: 2,
+                lineColor: ReactHighcharts.Highcharts.getOptions().colors[0]
+            }
+        }, {
+            name: 'Typical Range',
+            data: '',
+            type: 'arearange',
+            lineWidth: 0,
+            linkedTo: ':previous',
+            color: ReactHighcharts.Highcharts.getOptions().colors[0],
+            fillOpacity: 0.3,
+            zIndex: 0,
+            marker: {
+                enabled: false
+            }
+        }];
+    seriesConfig[0].data = series[0].data;
+    seriesConfig[1].data = range;
+
     let graphConfigs = JSON.parse(JSON.stringify(graphConfigsTemplate));
     graphConfigs.title.text = title;
-    graphConfigs.series = series;
+    graphConfigs.series = seriesConfig;
     return graphConfigs;
   };
 
@@ -183,13 +213,13 @@ class Dashboard extends Component {
       });
 
       let avgSeries = [{ name: 'Blood Glucose', data: statsResp.data.averages }];
-      let avgGraphConfigs = this.getGraphConfigs('Daily Average Glucose', avgSeries);
+      let avgGraphConfigs = this.getGraphConfigs('Daily Average Glucose', avgSeries, statsResp.data.range);
 
       let minSeries = [{ name: 'Blood Glucose', data: statsResp.data.mins }];
-      let minGraphConfigs = this.getGraphConfigs('Daily Minimum Glucose', minSeries);
+      let minGraphConfigs = this.getGraphConfigs('Daily Minimum Glucose', minSeries, statsResp.data.range);
 
       let maxSeries = [{ name: 'Blood Glucose', data: statsResp.data.maxs }];
-      let maxGraphConfigs = this.getGraphConfigs('Daily Maximum Glucose', maxSeries);
+      let maxGraphConfigs = this.getGraphConfigs('Daily Maximum Glucose', maxSeries, statsResp.data.range);
 
       this.setState({
         loadingText: '',
