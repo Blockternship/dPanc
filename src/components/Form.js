@@ -177,6 +177,7 @@ class FormsPage extends Component {
         address,
         uPortText: `Logged in as ${address} with uPort!`,
         uPortDisabled: true,
+        provider: uport.getProvider(),
       });
       uPortInstance.saveInstance(uport);
     });
