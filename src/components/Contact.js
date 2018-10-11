@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Card, Container } from 'semantic-ui-react';
 import KevImage from './7586429.jpeg';
 import AasimImage from './20843493.jpeg';
-import JakobImage from './15298645.jpeg';
+import JakobImage from './jakob.jpg';
 
 class Contact extends Component {
 
