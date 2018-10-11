@@ -1,4 +1,4 @@
-<img align="center" src="../src/logo.png" />
+<img align="center" src="../src/components/logo.png" />
 
 # dPanc
 Self Health Management dApp for Diabetes
@@ -23,7 +23,7 @@ The features list is split into the user-facing web application, backend service
 
 ### Web Application
 
-<img align="center" src="./images/upload_view.png" />
+<img align="center" src="./docs/images/upload_view.png" />
 
 - Full statistics in a dashboard on time weighted glucose averages 
 - The dashboard also includes max velocity of the user's blood glucose, user's Hemoglobin A1c, and other statistics around the user's blood glucose values 
@@ -36,7 +36,7 @@ The features list is split into the user-facing web application, backend service
 
 ## Data Flow 
 
-<img align="center" src="../images/data_flow.png" />
+<img align="center" src="../docs/images/data_flow.png" />
 
 ## Contracts
 
@@ -61,7 +61,6 @@ As this was our second project that incorporated blockchain, specifically Ethere
 - 
 
 
-=======
 ## Local Development
 
 1. `nvm use`
