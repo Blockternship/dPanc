@@ -10,6 +10,11 @@ import getDPanc from './../ethereum/dPanc';
 import uPortInstance from './../ethereum/uport';
 
 import { Connect } from 'uport-connect';
+
+import { getTimeWeightedMean } from './../services/AverageGlucoseService';
+import { getA1CFromMgPerDl } from './../services/A1CService';
+import { getTimeInZone } from './../services/TimeInZoneService';
+
 const uport = new Connect('dPanc');
 
 const dateOptions = [
@@ -29,6 +34,109 @@ const dateOptions = [
     value: 6
   }
 ];
+
+const getPieChargeConfig = (timeInNormal, timeInLow, timeInHigh) => ({
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Time in glucose zones'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: false
+            },
+            showInLegend: true
+        }
+    },
+    series: [{
+        name: 'Time in zone',
+        colorByPoint: true,
+        data: [{
+            name: 'Normal (80 - 180 mg/dL)',
+            y: timeInNormal,
+        }, {
+            name: 'Low (< 80 mg/dL)',
+            y: timeInLow
+        }, {
+            name: 'High (> 180 mg/dL)',
+            y: timeInHigh
+        }],
+    }]
+});
+
+const getSolidGuageConfig = guageValue => ({
+    chart: {
+        type: 'solidgauge'
+    },
+
+    title: null,
+
+    pane: {
+        center: ['50%', '85%'],
+        size: '140%',
+        startAngle: -90,
+        endAngle: 90,
+        background: {
+            backgroundColor: '#EEE',
+            innerRadius: '60%',
+            outerRadius: '100%',
+            shape: 'arc'
+        }
+    },
+
+    tooltip: {
+        enabled: false
+    },
+
+    // the value axis
+    yAxis: {
+        stops: [
+            [0.1, '#55BF3B'], // green
+            [0.5, '#DDDF0D'], // yellow
+            [0.9, '#DF5353'] // red
+        ],
+        lineWidth: 0,
+        minorTickInterval: null,
+        tickAmount: 2,
+        title: {
+            y: -150,
+            text: 'Hemoglobin A1C Estimate'
+        },
+        labels: {
+            y: 16
+        },
+        min: 5,
+        max: 12,
+    },
+
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                y: 5,
+                borderWidth: 0,
+                useHTML: true
+            }
+        }
+    },
+    credits: {
+        enabled: false
+    },
+
+    series: [{
+        name: 'Speed',
+        data: [guageValue],
+    }]
+});
 
 const graphConfigsTemplate = {
   chart: {
@@ -183,7 +291,7 @@ class Dashboard extends Component {
         loadingText: 'Fetching data from OrbitDB...'
       })
 
-      // Attempt to get user DB address from dPanc contract      
+      // Attempt to get user DB address from dPanc contract
       if (web3) {
         let dPanc = getDPanc(this.state.provider);
         var dbAddress = await dPanc.methods.getDbAddress(this.state.address).call({from: this.state.address});
@@ -212,6 +320,20 @@ class Dashboard extends Component {
         data: parsedData
       });
 
+      const data = parsedData.glucose.map(entry => ({
+        timestamp: (new Date(entry[0])).getTime(),
+        glucose: Number(entry[1]),
+      }));
+
+      const longTermAverage = getTimeWeightedMean(data);
+      const a1c = getA1CFromMgPerDl(longTermAverage);
+
+      const {
+        timeInNormal,
+        timeInLow,
+        timeInHigh,
+      } = getTimeInZone(data);
+
       let avgSeries = [{ name: 'Blood Glucose', data: statsResp.data.averages }];
       let avgGraphConfigs = this.getGraphConfigs('Daily Average Glucose', avgSeries, statsResp.data.range);
 
@@ -225,7 +347,9 @@ class Dashboard extends Component {
         loadingText: '',
         avgGraph: <HighchartsContainer config={avgGraphConfigs} />,
         minGraph: <HighchartsContainer config={minGraphConfigs}/>,
-        maxGraph: <HighchartsContainer config={maxGraphConfigs}/>
+        maxGraph: <HighchartsContainer config={maxGraphConfigs}/>,
+        a1cGuage: <HighchartsContainer config={getSolidGuageConfig(a1c)}/>,
+        timeInZonesPieChart: <HighchartsContainer config={getPieChargeConfig(timeInNormal, timeInLow, timeInHigh)}/>,
       })
     }
     // Else error happened or no data for specified time period
@@ -310,6 +434,10 @@ class Dashboard extends Component {
           </Segment>
           <Segment basic>
             {this.state.maxGraph}
+          </Segment>
+          <Segment basic className="twoColumns">
+            {this.state.a1cGuage}
+            {this.state.timeInZonesPieChart}
           </Segment>
         </Container>
       );

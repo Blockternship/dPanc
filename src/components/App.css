@@ -8,3 +8,8 @@ body {
 .App-intro {
   font-size: large;
 }
+
+.twoColumns > div {
+  width: 50%;
+  display: inline-block;
+}
