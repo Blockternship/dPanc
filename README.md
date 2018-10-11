@@ -1,5 +1,6 @@
-<img align="center" src="./src/components/logo.png" />
-
+<!-- <img align="center" src="./src/components/logo.png" />
+ -->
+ 
 # dPanc
 Self Health Management dApp for Diabetes
 
