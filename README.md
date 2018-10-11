@@ -14,7 +14,23 @@ We would also like to explore an abstraction of this idea. The notion of individ
 # Philosophy
 
 We believe that the burden of type one diabetes can be significantly reduced if patients were given the appropriate tools to manage their health. But the tools being prescribed by doctors are inadequate, and the centralization of these tools make changes slow and ineffective. If individual patients shared their medical data to support the creation of these decentralized tools, we can bring the ability to enact change to the people whom it will affect the most.
-=======
+
+# Features
+- MetaMask and uPort integration for registering users
+- Calculate metrics and statistics for blood glucose levels:
+    - min, max, and avg
+    - velocity
+- Anomaly detection through highlighting target ranges
+
+# Tech Stack
+- Node.js & Express.js backend server
+- React.js frontend
+- OrbitDB (IPFS) for data storage
+- Solidity & Truffle for contract development and deployment
+
+# Flow
+![Data Flow](docs/images/data_flow.png)
+
 ## Local Development
 
 1. `nvm use`
@@ -29,7 +45,7 @@ You'll need to make sure you have `nvm` installed and the proper version of node
 2. `nvm install 9`
 
 
-## Contracts (WIP)
+## Contracts
 
 1. `cd contracts && yarn`
 2. `yarn test:contracts`

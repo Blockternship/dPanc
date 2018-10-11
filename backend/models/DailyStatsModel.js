@@ -79,7 +79,7 @@ module.exports = function DailyStatsModel(data) {
         month = key.slice(0, 2),
         day = key.slice(3,5);
     model.range.push(
-      [Date.UTC(year, month - 1, day), 60.0, 90.0]
+      [Date.UTC(year, month - 1, day), 60.0, 250.0]
     );
   });
 

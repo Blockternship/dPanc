@@ -137,7 +137,7 @@ class Dashboard extends Component {
                 lineColor: ReactHighcharts.Highcharts.getOptions().colors[0]
             }
         }, {
-            name: 'Typical Range',
+            name: 'Target Range',
             data: '',
             type: 'arearange',
             lineWidth: 0,
