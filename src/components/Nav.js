@@ -16,7 +16,7 @@ class Nav extends Component {
             />
             dPanc
           </Menu.Item>
-          <Menu.Item as={Link}  to="/form" content="Home"/>
+          <Menu.Item as={Link} to="/form" content="Home"/>
           <Menu.Item as={Link} to="/dashboard" content="Dashboard"/>
           <Menu.Item as={Link} to="/research" content="Research"/>
           <Menu.Item as={Link} to="/contact" content="Contact us"/>

@@ -1,5 +1,3 @@
-<!-- <img align="center" src="./src/components/logo.png" />
- -->
  
 # dPanc
 Self Health Management dApp for Diabetes
@@ -35,9 +33,6 @@ The features list is split into the user-facing web application, backend service
 
 ## Backend Services & Processes
 
-## Data Flow 
-
-<img align="center" src="./docs/images/data_flow.png" />
 
 ## Contracts
 
@@ -61,6 +56,22 @@ As this was our second project that incorporated blockchain, specifically Ethere
 - 
 - 
 
+# Features
+- MetaMask and uPort integration for registering users
+- Calculate metrics and statistics for blood glucose levels:
+    - min, max, and avg
+    - velocity
+- Anomaly detection through highlighting target ranges
+
+# Tech Stack
+- Node.js & Express.js backend server
+- React.js frontend
+- OrbitDB (IPFS) for data storage
+- Solidity & Truffle for contract development and deployment
+
+# Flow
+![Data Flow](docs/images/data_flow.png)
+
 ## Local Development
 
 1. `nvm use`
@@ -75,7 +86,7 @@ You'll need to make sure you have `nvm` installed and the proper version of node
 2. `nvm install 9`
 
 
-## Contracts (WIP)
+## Contracts
 
 1. `cd contracts && yarn`
 2. `yarn test:contracts`

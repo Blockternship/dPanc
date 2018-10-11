@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import HighchartsContainer from './HighchartsContainer';
 import ReactHighcharts from 'react-highcharts';
-import { Container, Dimmer, Dropdown, Loader, Message, Segment } from 'semantic-ui-react';
+import { Button, Container, Dimmer, Dropdown, Loader, Message, Segment } from 'semantic-ui-react';
 import axios from 'axios';
-import getWeb3 from './../ethereum/web3';
 import moment from 'moment';
+
+import getWeb3 from './../ethereum/web3';
+import getDPanc from './../ethereum/dPanc';
+import uPortInstance from './../ethereum/uport';
+
 import { Connect } from 'uport-connect';
 const uport = new Connect('dPanc');
-const jsonInterface = require("../ethereum/dPanc.json");
 
 const dateOptions = [
   {
@@ -29,10 +32,15 @@ const dateOptions = [
 
 const graphConfigsTemplate = {
   chart: {
-    type: 'column'
+    type: 'line'
   },
   title: {
     text: ''
+  },
+  tooltip: {
+        crosshairs: true,
+        shared: true,
+        valueSuffix: '°C'
   },
   xAxis: {
       type: 'datetime',
@@ -61,19 +69,41 @@ class Dashboard extends Component {
     avgGraph: '',
     minGraph: '',
     maxGraph: '',
+    provider: '',
+    uPortText: 'Login with uPort',
+    uPortDisabled: false,
   };
 
   async componentDidMount() {
-    await this.getAccountAddress();
+    let provider = uPortInstance.getProvider();
+    if (provider) {
+      this.setState({
+        provider,
+      });
+    }
 
-    let web3 = getWeb3();
+    let state = this.props.location.state;
+    if (state) {
+      const { address, uPortText, uPortDisabled } = state;
+        await this.setState({
+          address,
+          uPortText,
+          uPortDisabled,
+        });
+    }
+
+    if (!this.state.address) {
+      await this.getAccountAddress();
+    }
+
+    let web3 = getWeb3(this.state.provider);
     if (web3) {
       this.renderGraphs();
     }
   }
 
   getAccountAddress = async () => {
-    let web3 = getWeb3();
+    let web3 = getWeb3(this.state.provider);
 
     if (!web3) {
       console.log('Could not detect MetaMask.');
@@ -96,10 +126,35 @@ class Dashboard extends Component {
     }
   };
 
-  getGraphConfigs = (title, series) => {
+  getGraphConfigs = (title, series, range) => {
+    let seriesConfig = [{
+            name: 'Blood Glucose',
+            data: '',
+            zIndex: 1,
+            marker: {
+                fillColor: 'white',
+                lineWidth: 2,
+                lineColor: ReactHighcharts.Highcharts.getOptions().colors[0]
+            }
+        }, {
+            name: 'Target Range',
+            data: '',
+            type: 'arearange',
+            lineWidth: 0,
+            linkedTo: ':previous',
+            color: ReactHighcharts.Highcharts.getOptions().colors[0],
+            fillOpacity: 0.3,
+            zIndex: 0,
+            marker: {
+                enabled: false
+            }
+        }];
+    seriesConfig[0].data = series[0].data;
+    seriesConfig[1].data = range;
+
     let graphConfigs = JSON.parse(JSON.stringify(graphConfigsTemplate));
     graphConfigs.title.text = title;
-    graphConfigs.series = series;
+    graphConfigs.series = seriesConfig;
     return graphConfigs;
   };
 
@@ -114,7 +169,7 @@ class Dashboard extends Component {
   };
 
   renderGraphs = async () => {
-    let web3 = getWeb3();
+    let web3 = getWeb3(this.state.provider);
     var parsedData = null;
 
     // Get parsed data from
@@ -130,10 +185,8 @@ class Dashboard extends Component {
 
       // Attempt to get user DB address from dPanc contract      
       if (web3) {
-        let dPanc = new web3.eth.Contract(jsonInterface.abi,         
-          '0xfa29857ea29515187f3e0c590cdcd8cd0d0bcf02'
-        );
-        var dbAddress = await dPanc.methods.getDbAddress().call({from: this.state.address});
+        let dPanc = getDPanc(this.state.provider);
+        var dbAddress = await dPanc.methods.getDbAddress(this.state.address).call({from: this.state.address});
 
         if (dbAddress) {
           let dates = this.getLookbackMonths(this.state.lookbackMonths);
@@ -160,13 +213,13 @@ class Dashboard extends Component {
       });
 
       let avgSeries = [{ name: 'Blood Glucose', data: statsResp.data.averages }];
-      let avgGraphConfigs = this.getGraphConfigs('Daily Average Glucose', avgSeries);
+      let avgGraphConfigs = this.getGraphConfigs('Daily Average Glucose', avgSeries, statsResp.data.range);
 
       let minSeries = [{ name: 'Blood Glucose', data: statsResp.data.mins }];
-      let minGraphConfigs = this.getGraphConfigs('Daily Minimum Glucose', minSeries);
+      let minGraphConfigs = this.getGraphConfigs('Daily Minimum Glucose', minSeries, statsResp.data.range);
 
       let maxSeries = [{ name: 'Blood Glucose', data: statsResp.data.maxs }];
-      let maxGraphConfigs = this.getGraphConfigs('Daily Maximum Glucose', maxSeries);
+      let maxGraphConfigs = this.getGraphConfigs('Daily Maximum Glucose', maxSeries, statsResp.data.range);
 
       this.setState({
         loadingText: '',
@@ -188,8 +241,8 @@ class Dashboard extends Component {
     event.preventDefault();
 
     this.props.location.state = null;
-    
-    let web3 = getWeb3();
+
+    let web3 = getWeb3(this.state.provider);
 
     if (web3) {
       if (data.value !== this.state.lookbackMonths) {
@@ -202,12 +255,47 @@ class Dashboard extends Component {
     }
   };
 
+  authWithuPort = async () => {
+    await uport.requestDisclosure({});
+    uport.onResponse('disclosureReq').then(res => {
+      let address = res.payload.did.split(':')[2];
+      this.setState({
+        error: '',
+        loadingText: '',
+        address,
+        provider: uport.getProvider(),
+        uPortText: `Logged in as ${address} with uPort!`,
+        uPortDisabled: true,
+      });
+    });
+  };
+
+  onUploadClick = async () => {
+    const { address, uPortText, uPortDisabled } = this.state;
+
+    this.props.history.push({
+      pathname: '/form',
+      state: {
+        address,
+        uPortText,
+        uPortDisabled,
+        disabled: false,
+      },
+    });
+  }
+
   render() {
       return (
         <Container style={{ marginTop: '7em' }}>
           <Message negative hidden={!this.state.error}>
             <Message.Header>{this.state.error}</Message.Header>
           </Message>
+          <Segment basic>
+            <Button color='violet' disabled={this.state.uPortDisabled} onClick={this.authWithuPort}>{this.state.uPortText}</Button>
+          </Segment>
+          <Segment basic>
+            <Button primary onClick={this.onUploadClick}>Upload</Button>
+          </Segment>
           <Segment basic>
             <Dropdown button selection defaultValue={dateOptions[0].key} options={dateOptions} onChange={this.onChangeDateOption}/>
           </Segment>
@@ -224,9 +312,9 @@ class Dashboard extends Component {
             {this.state.maxGraph}
           </Segment>
         </Container>
-        )
+      );
     }
-}
+  }
 
 require("highcharts/js/highcharts-more")(ReactHighcharts.Highcharts);
 require("highcharts/js/modules/solid-gauge.js")(ReactHighcharts.Highcharts);
