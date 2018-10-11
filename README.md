@@ -1,4 +1,4 @@
-<img align="center" src="./src/logo.png" />
+<img align="center" src="../src/logo.png" />
 
 # dPanc
 Self Health Management dApp for Diabetes
@@ -36,7 +36,7 @@ The features list is split into the user-facing web application, backend service
 
 ## Data Flow 
 
-<img align="center" src="./images/data_flow.png" />
+<img align="center" src="../images/data_flow.png" />
 
 ## Contracts
 
@@ -60,7 +60,6 @@ As this was our second project that incorporated blockchain, specifically Ethere
 - 
 - 
 
-## Data Workflow 
 
 =======
 ## Local Development
