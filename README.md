@@ -22,7 +22,7 @@ We believe that the burden of type one diabetes can be significantly reduced if 
 
 - Full statistics in a dashboard on time weighted glucose averages 
 - The dashboard also includes max velocity of the user's blood glucose, user's Hemoglobin A1c, and other statistics around the user's blood glucose values 
-- Manage gas fees and any transaction with full MetaMask integration to allow the user to create an entry of data, retrieve analysis around their data, and eventually earn tokens for their data!)
+- Manage gas fees and any transaction with full MetaMask and uPort integration to allow the user to create an entry of data, retrieve analysis around their data, and eventually earn tokens for their data!)
 - Research pages to comparison metrics to benchmark your averages as well as description regarding what what the purpose of our work is as well as what the methodology is behind each of our analysis pieces. 
 - Upload page which consists of a form which has integrated with MetaMask initiating our smart contract to put the user's data onto the blockchain
 
