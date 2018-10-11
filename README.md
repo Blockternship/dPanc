@@ -16,10 +16,6 @@ We would also like to explore an abstraction of this idea. The notion of individ
 
 We believe that the burden of type one diabetes can be significantly reduced if patients were given the appropriate tools to manage their health. But the tools being prescribed by doctors are inadequate, and the centralization of these tools make changes slow and ineffective. If individual patients shared their medical data to support the creation of these decentralized tools, we can bring the ability to enact change to the people whom it will affect the most.
 
-## Features
-
-The features list is split into the user-facing web application, backend services, and contracts.
-
 ### Web Application
 
 <img align="center" src="./docs/images/upload_view.png" />
@@ -32,29 +28,14 @@ The features list is split into the user-facing web application, backend service
 
 
 ## Backend Services & Processes
+- Parsing the CSV file containing the blood glucose values
+- Utilizing OrbitDB to create a db for each entry of data 
+- We are able to generate an entry and retrieve that entry which is on the blockchain 
 
 
 ## Contracts
-
-
-## Next Steps
-
-As this was only a hackathon, there are still many improvements that can be made to dPanc (decentralized Pancreas)
-
-Here is a list of major improvements that we wish we had time to implement:
-- Better UI/UX design (we focused on building functionality as opposed to designing UI/UX)
-- 
-- Tokenization of dPanc and generating reward structure for users 
-- Incorporating advanced calculations around blood glucose and Hemoglobin A1c
-
-
-## What We Learned
-
-As this was our second project that incorporated blockchain, specifically Ethereum, as well as our first time utilizing OrbitDB and smart contracts, and we wanted to share the major accomplishments and learnings from this hackathon:
-- How the Ethereum network works
-- 
-- 
-- 
+- Utilized Solidity and Truffle to develop the smart contract where the user is uploading data to the blockchain
+- Ropsten Test Network is the test network where the smart contract is being substantiated
 
 # Features
 - MetaMask and uPort integration for registering users
@@ -69,8 +50,25 @@ As this was our second project that incorporated blockchain, specifically Ethere
 - OrbitDB (IPFS) for data storage
 - Solidity & Truffle for contract development and deployment
 
-# Flow
+# Data Flow
 ![Data Flow](docs/images/data_flow.png)
+
+## Next Steps
+
+As this was only a hackathon, there are still many improvements that can be made to dPanc (decentralized Pancreas)
+
+Here is a list of major improvements that we wish we had time to implement:
+- Better UI/UX design (we focused on building functionality as opposed to designing UI/UX)
+- Tokenization of dPanc and generating reward structure for users 
+- Incorporating advanced calculations around blood glucose and Hemoglobin A1c
+- Strategizing our future of dPanc as an application programming interface.
+
+## What We Learned
+
+As this was our second project that incorporated blockchain, specifically Ethereum, as well as our first time utilizing OrbitDB, and we wanted to share the major accomplishments and learnings from this hackathon:
+- How the Ethereum network works when utilizing an IPFS database 
+- Acquiring data from a blood glucose monitor is easier than expected
+- Hemoglobin A1c is not an easily attainable metric for diabetics
 
 ## Local Development
 
