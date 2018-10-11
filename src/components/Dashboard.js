@@ -237,6 +237,7 @@ class Dashboard extends Component {
   getGraphConfigs = (title, series, range) => {
     let seriesConfig = [{
             name: 'Blood Glucose',
+            type: 'spline',
             data: '',
             zIndex: 1,
             marker: {
