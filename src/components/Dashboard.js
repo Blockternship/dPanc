@@ -15,6 +15,12 @@ import { getTimeWeightedMean } from './../services/AverageGlucoseService';
 import { getA1CFromMgPerDl } from './../services/A1CService';
 import { getTimeInZone } from './../services/TimeInZoneService';
 
+const UPORT_LOGIN_DEFAULT_TEXT = 'Login with uPort';
+const UPORT_DESABLED_DEFAULT = false;
+
+const METAMASK_FETCH_ERROR_MESSAGE = 'Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.';
+const METAMASK_DETECTION_ERROR_MESSAGE = 'Could not detect MetaMask. Please make sure MetaMask is enabled!';
+
 const uport = new Connect('dPanc');
 
 const dateOptions = [
@@ -169,39 +175,30 @@ const graphConfigsTemplate = {
 };
 
 class Dashboard extends Component {
-  state = {
-    address: '',
-    loadingText: '',
-    error: '',
-    lookbackMonths: 1,
-    avgGraph: '',
-    minGraph: '',
-    maxGraph: '',
-    provider: '',
-    uPortText: 'Login with uPort',
-    uPortDisabled: false,
-  };
+  constructor(props) {
+    super(props);
+
+    const locationState = props.location.state;
+
+    this.state = {
+      address: locationState ? locationState.address : '',
+      uPortText: locationState ? locationState.uPortText : UPORT_LOGIN_DEFAULT_TEXT,
+      uPortDisabled: locationState ? locationState.uPortDisabled : UPORT_DESABLED_DEFAULT,
+      loadingText: '',
+      error: '',
+      lookbackMonths: 1,
+      avgGraph: '',
+      minGraph: '',
+      maxGraph: '',
+      provider: uPortInstance.getProvider(),
+    }
+  }
 
   async componentDidMount() {
-    let provider = uPortInstance.getProvider();
-    if (provider) {
-      this.setState({
-        provider,
-      });
-    }
-
-    let state = this.props.location.state;
-    if (state) {
-      const { address, uPortText, uPortDisabled } = state;
-        await this.setState({
-          address,
-          uPortText,
-          uPortDisabled,
-        });
-    }
-
     if (!this.state.address) {
-      await this.getAccountAddress();
+      const address = await this.getAccountAddress();
+
+      await this.setState({ address });
     }
 
     let web3 = getWeb3(this.state.provider);
@@ -213,25 +210,23 @@ class Dashboard extends Component {
   getAccountAddress = async () => {
     let web3 = getWeb3(this.state.provider);
 
-    if (!web3) {
-      console.log('Could not detect MetaMask.');
-      this.setState({
-        error: 'Could not detect MetaMask. Please make sure MetaMask is enabled!'
-      });
-    } else {
+    if (web3) {
       const address = await web3.eth.getAccounts();
 
-      if (address.length === 0) {
-        console.log('Could not fetch accounts from MetaMask. Make sure you are logged into MetaMask.');
-        this.setState({
-          error: 'Could not fetch accounts from MetaMask! Make sure you are logged into MetaMask.',
-        });
-      } else {
-        this.setState({
-          address: address[0],
-        });
+      if (address.length > 0) {
+        return address[0];
       }
+
+      console.log(METAMASK_FETCH_ERROR_MESSAGE);
+      this.setState({ error: METAMASK_FETCH_ERROR_MESSAGE });
+
+      return '';
     }
+
+    console.log(METAMASK_DETECTION_ERROR_MESSAGE);
+    this.setState({ error: METAMASK_DETECTION_ERROR_MESSAGE });
+
+    return '';
   };
 
   getGraphConfigs = (title, series, range) => {
